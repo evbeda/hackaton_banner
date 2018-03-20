@@ -6,3 +6,4 @@ ctags
 db.sqlite3
 .DS_Store
 .env
+local_settings.py
