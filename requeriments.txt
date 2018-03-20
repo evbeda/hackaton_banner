@@ -1,3 +1,9 @@
+Django==1.11
+social-auth-app-django==2.1.0
+eventbrite==3.3.3
+dj-database-url==0.4.2
+gunicorn==19.7.1
+whitenoise==3.3.1
 certifi==2018.1.18
 chardet==3.0.4
 coverage==4.0.3
@@ -8,3 +14,4 @@ requests==2.18.4
 six==1.11.0
 urllib3==1.22
 mock==2.0.0
+psycopg2-binary==2.7.4
