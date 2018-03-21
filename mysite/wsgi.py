@@ -8,13 +8,9 @@ https://docs.djangoproject.com/en/1.11/howto/deployment/wsgi/
 """
 
 import os
-import sys
 from whitenoise.django import DjangoWhiteNoise
 from django.core.wsgi import get_wsgi_application
 
-path = '/home/fmezzabotta/evb_banner' # aquí utiliza tu propio usuario, sin los simbolos < y >
-if path not in sys.path:
-    sys.path.append(path)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 
 application = get_wsgi_application()
