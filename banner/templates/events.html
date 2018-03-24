@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>My Events!</title>
-</head>
-<body>
-<h1>My events!</h1>
-{% for event in events %}
-    <p>{{ event }}</p>
-{% endfor %}
-</body>
-</html>
+{% extends './shared/base.html' %}
+
+{% block content %}
+  <h1>Your events</h1>
+  {% for event in events %}
+  <div class="media" style="padding-top: 40px;">
+    <div class="media-left">
+      <a href="{{ event.logo.url }}">
+        <img class="pull-left" src={{ event.logo.url }} alt="Logo" height="50%" width="50%">
+      </a>
+    </div>
+    <div class="media-body" style="padding-left:10px;">
+      <h4 class="media-heading">{{ event.name.text }}</h4>
+      <p>{{ event.description.text }}</p>
+    </div>
+  </div>
+  {% endfor %}
+{% endblock %}

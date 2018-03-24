@@ -28,7 +28,7 @@ SECRET_KEY = '+sm9a(b9bubb(_xdh_dwe6+1k!d_5k8m=r*ox*@7p91#jt(qez'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
+ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'localhost', '.herokuapp.com']
 
 # Application definition
 
@@ -162,8 +162,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+DB_FROM_ENV = dj_database_url.config(conn_max_age=500)
+
+DATABASES['default'].update(DB_FROM_ENV)
 try:
     from local_settings import *
 except ImportError:
