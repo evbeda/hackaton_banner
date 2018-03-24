@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from django.db import models
 from django.utils import timezone
 
@@ -20,11 +18,25 @@ class Events(models.Model):
 
 
 class Banner(models.Model):
-    pass
+    banner_design = models.ForeignKey(
+        'models.BannerDesign',
+    )
+    # event = models.ForeignKey(
+    #     'models.Event',
+    #     on_delete=models.CASCADE,
+    # )
+    user = models.ForeignKey('auth.User')
+    banner_title = models.CharField(max_length=200)
+    banner_description = models.TextField()
+    created_date = models.DateTimeField(
+        default=timezone.now)
 
 
 class BannerDesign(models.Model):
-    pass
+    user = models.ForeignKey('auth.User')
+    banner_design_name = models.CharField(max_length=200)
+    created_date = models.DateTimeField(
+        default=timezone.now)
 
 
 class EventDesign(models.Model):
