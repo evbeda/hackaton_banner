@@ -1,0 +1,35 @@
+{% load staticfiles %}
+<html>
+  <head>
+    <title>EventbriteBanner</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="{% static 'css/banner.css' %}">
+    <link href="https://fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/c
+ss">
+  </head>
+  <body>
+    <div class="page-header">
+      <div class="row">
+        <div class="col-md-4">
+          <h1>
+              <a href="">EventbriteBanner</a>
+          </h1>
+        </div>
+        <div class="col-md-8">
+          {% if user.is_authenticated %}
+          <h5 class="pull-right" style="padding-top:20px; padding-right:15px;">{{ user.first_name }} {{ user.last_name }}</h5>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="content container">
+      <div class="row">
+        <div class="col-md-8">
+            {% block content %}
+            {% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

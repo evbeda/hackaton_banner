@@ -1,21 +1,14 @@
 {#{% load activeurl%}#}
-<html>
-    <head>
-        <title>Banner App for Events</title>
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-        <link href="https://fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/css">
-    </head>
-<body>
+{% extends './shared/base.html' %}
 
-<div class="page-header">
-<h1>Banner App for Events</h1>
-</div>
-<div>
-    <h2><a href="/banner/events">Create new banner</a></h2>
-</div>
-<div>
-    <h1>aqui van los banners</h1>
-</div>
-</body>
-</html>
+{% block content %}
+    <div>
+        <h1>No banners yet!</h1>
+    </div>
+    
+    <a href="{% url 'banner_new' %}">
+      <div class="glyphicon-ring glyphicon-white plus-banner-button">
+        <span class="glyphicon glyphicon-plus glyphicon-bordered"></span>
+      </div>
+    </a>
+{% endblock %}

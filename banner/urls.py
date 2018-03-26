@@ -6,5 +6,6 @@ from .views import EventsView
 
 urlpatterns = [
 
-    url(r'^events/$', EventsView.as_view(template_name='events.html')),
+    url(r'^new/$', EventsView.as_view(template_name='events.html'),
+        name='banner_new'),
 ]
