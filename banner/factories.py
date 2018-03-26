@@ -14,11 +14,12 @@ class UserFactory(DjangoModelFactory):
     last_name = Sequence(lambda n: "Agent%03d" % n)
     username = lazy_attribute(lambda o: slugify(o.first_name + '.' + o.last_name))
 
+
 class BannerDesignFactory(DjangoModelFactory):
     class Meta:
         model = models.BannerDesign
         django_get_or_create = ('user',)
 
     user = SubFactory(UserFactory)
-    banner_design_name = Sequence(lambda n: "BannerDesign%03d" % n)
-    created_date = LazyFunction(timezone.now)
+    name = Sequence(lambda n: "BannerDesign%03d" % n)
+    created = LazyFunction(timezone.now)

@@ -17,34 +17,35 @@ class BannerDesignTest(TestCase):
     def create_banner_design(self, name="Banner design"):
         return BannerDesign.objects.create(
             user=UserFactory(),
-            banner_design_name=name,
-            created_date=timezone.now(),
-            )
+            name=name,
+            created=timezone.now(),
+        )
 
     def test_banner_design_creation(self):
         w = self.create_banner_design()
         self.assertTrue(isinstance(w, BannerDesign))
-        self.assertEqual("Banner design", w.banner_design_name)
+        self.assertEqual("Banner design", w.name)
 
 
 class BannerTest(TestCase):
 
     def create_banner(
-            self, banner_title='Banner title',
-            banner_description='A description'
-            ):
+            self,
+            title='Banner title',
+            description='A description',
+    ):
         return Banner.objects.create(
-            banner_design=BannerDesignFactory(),
+            design=BannerDesignFactory(),
             user=UserFactory(),
-            banner_title=banner_title,
-            banner_description=banner_description,
-            created_date=timezone.now(),
-            )
+            title=title,
+            description=description,
+            created=timezone.now(),
+        )
 
     def test_banner_design_creation(self):
         w = self.create_banner()
         self.assertTrue(isinstance(w, Banner))
-        self.assertEqual("Banner title", w.banner_title)
+        self.assertEqual("Banner title", w.title)
 
 
 # class TestSignup(unittest.TestCase):

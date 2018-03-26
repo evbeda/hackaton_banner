@@ -1,42 +1,50 @@
+from django.conf import settings
 from django.db import models
-from django.utils import timezone
-
-
-class Event(models.Model):
-    event_title = models.CharField(max_length=200)
-    event_description = models.TextField()
-    event_start = models.DateTimeField()
-    event_end = models.DateTimeField()
-    event_logo = models.CharField(max_length=200)
-    event_organizer = models.CharField(max_length=200)
-    event_custom_title = models.CharField(max_length=200)
-    enven_custom_logo = models.CharField(max_length=200)
-    event_custom_description = models.TextField()
-    banner = models.ForeignKey(
-        'banner.Banner')
-    event_design = models.ForeignKey('banner.EventDesign')
-
-
-class Banner(models.Model):
-    banner_design = models.ForeignKey(
-        'banner.BannerDesign',
-    )
-    user = models.ForeignKey('auth.User')
-    banner_title = models.CharField(max_length=200)
-    banner_description = models.TextField()
-    created_date = models.DateTimeField(
-        default=timezone.now)
-
-
-class BannerDesign(models.Model):
-    user = models.ForeignKey('auth.User')
-    banner_design_name = models.CharField(max_length=200)
-    created_date = models.DateTimeField(
-        default=timezone.now)
 
 
 class EventDesign(models.Model):
-    event_design_user = models.ForeignKey('auth.User')
-    event_design_name = models.CharField(max_length=200)
-    created_date = models.DateTimeField(
-        default=timezone.now)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    changed = models.DateTimeField(auto_now=True, blank=True)
+
+
+class BannerDesign(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    changed = models.DateTimeField(auto_now=True, blank=True)
+
+
+class Banner(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    design = models.ForeignKey(BannerDesign)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    changed = models.DateTimeField(auto_now=True, blank=True)
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    start = models.DateTimeField()
+    end = models.DateTimeField()
+    logo = models.CharField(max_length=200)
+    organizer = models.CharField(max_length=200)
+    custom_title = models.CharField(max_length=200)
+    custom_logo = models.CharField(max_length=200)
+    custom_description = models.TextField()
+    banner = models.ForeignKey(Banner)
+    design = models.ForeignKey(EventDesign)
+    created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    changed = models.DateTimeField(auto_now=True, blank=True)
