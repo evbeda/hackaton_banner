@@ -1,4 +1,10 @@
-from factory import DjangoModelFactory, Sequence, SubFactory, LazyFunction, lazy_attribute
+from factory import (
+    DjangoModelFactory,
+    Sequence,
+    SubFactory,
+    LazyFunction,
+    lazy_attribute,
+)
 from . import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
@@ -12,7 +18,11 @@ class UserFactory(DjangoModelFactory):
 
     first_name = Sequence(lambda n: "Agent%03d" % n)
     last_name = Sequence(lambda n: "Agent%03d" % n)
-    username = lazy_attribute(lambda o: slugify(o.first_name + '.' + o.last_name))
+    username = lazy_attribute(
+        lambda o: slugify(
+            o.first_name + '.' + o.last_name,
+        )
+    )
 
 
 class BannerDesignFactory(DjangoModelFactory):

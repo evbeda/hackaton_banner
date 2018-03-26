@@ -6,4 +6,6 @@ tags
 db.sqlite3
 .DS_Store
 .env
+.coverage
+.coveragerc
 local_settings.py
