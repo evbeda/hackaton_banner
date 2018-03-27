@@ -3,17 +3,14 @@
 
 {% block content %}
   <h1>Your events</h1>
-  {% for event in events %}
-  <div class="media" style="padding-top: 40px;">
-    <div class="media-left">
-      <a href="{{ event.logo.url }}">
-        <img class="pull-left" src={{ event.logo.url }} alt="Logo" height="50%" width="50%">
-      </a>
-    </div>
-    <div class="media-body" style="padding-left:10px;">
-      <h4 class="media-heading">{{ event.name.text }}</h4>
-      <p>{{ event.description.text }}</p>
-    </div>
-  </div>
-  {% endfor %}
+    <h3>Select your events for create a new banner</h3>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+      <div class="media" style="padding-top: 40px;">
+        <p><input type="submit" name="Events Selected"></p>
+      </div>
+
+</form>
 {% endblock %}
+

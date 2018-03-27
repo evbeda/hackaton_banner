@@ -47,6 +47,12 @@ class BannerTest(TestCase):
         self.assertTrue(isinstance(w, Banner))
         self.assertEqual("Banner title", w.title)
 
+# class EventTest(TestCase):
+#     def test_events_saved(self):
+
+
+
+
 
 # class TestSignup(unittest.TestCase):
 
