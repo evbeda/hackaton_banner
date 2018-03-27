@@ -3,17 +3,37 @@
 
 {% block content %}
   <h1>Your events</h1>
+    <h3>Select your events for create a new banner</h3>
+  <form method="post">
   {% for event in events %}
-  <div class="media" style="padding-top: 40px;">
-    <div class="media-left">
-      <a href="{{ event.logo.url }}">
-        <img class="pull-left" src={{ event.logo.url }} alt="Logo" height="50%" width="50%">
-      </a>
-    </div>
-    <div class="media-body" style="padding-left:10px;">
-      <h4 class="media-heading">{{ event.name.text }}</h4>
-      <p>{{ event.description.text }}</p>
-    </div>
+  <div class="row">
+      <div class="col-md-6">
+          <div class="media" style="padding-top: 40px;">
+              <a href="{{ event.logo.url }}">
+                  <img class="pull-left" src={{ event.logo.url }} alt="Logo" height="100%" width="100%">
+              </a>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="media" style="padding-top: 40px;">
+          <div class="media-body" style="padding-left:5px;">
+              <h4 class="media-heading">{{ event.name.text }}</h4>
+                <p>{{ event.description.text }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="media" style="padding-top: 90px;">
+          <div class="media-body" style="padding-left:7px;">
+            <p><input type="checkbox" id='{id.event}'></p>
+          </div>
+        </div>
+      </div>
   </div>
   {% endfor %}
+</form>
+  <div class="media" style="padding-top: 40px;">
+    <p><input type="submit" name="Events Selected"></p>
+  </div>
 {% endblock %}
+
