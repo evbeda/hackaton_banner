@@ -55,7 +55,7 @@ class EventsView(TemplateView, LoginRequiredMixin):
 @method_decorator(login_required, name='dispatch')
 class BannerView(TemplateView, LoginRequiredMixin):
 
-    template_name = "index.html"
+    template_name = 'index.html'
 
     def get_context_data(self, **kwargs):
         # self.banner_new()
@@ -72,3 +72,18 @@ class BannerDetailView(DetailView, LoginRequiredMixin):
     def get_object(self):
         banner = Banner.objects.get(id=self.kwargs['pk'])
         return banner
+
+
+@method_decorator(login_required, name='dispatch')
+class BannerDesignView(TemplateView, LoginRequiredMixin):
+
+    template_name = 'banner/banner_design.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BannerDesignView, self).get_context_data(**kwargs)
+        context['banner'] = Banner.objects.get(id=self.kwargs['pk'])
+        context['events'] = [
+            event
+            for event in Event.objects.filter(banner=context['banner'])
+        ]
+        return context

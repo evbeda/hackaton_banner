@@ -16,14 +16,27 @@ from .factories import (
     BannerDesignFactory,
     UserFactory,
 )
-# Create your tests here.
 
 
-class ProjectTests(TestCase):
+class TestBase(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create(
+            username='testuser',
+            password='12345',
+            is_active=True,
+            is_staff=True,
+            is_superuser=True
+        )
+        self.user.set_password('hello')
+        self.user.save()
+        login = self.client.login(username='testuser', password='hello')
+        return login
+
+
+class IndexViewTest(TestBase):
 
     def setUp(self):
-        login = get_login(self)
-        self.assertTrue(login)
+        super(IndexViewTest, self).setUp()
 
     def test_homepage(self):
         response = self.client.get('/')
@@ -34,32 +47,36 @@ class ProjectTests(TestCase):
         self.assertContains(response, 'No banners yet!')
 
 
-class BannerViewTest(TestCase):
-
-    def setUp(self):
-        login = get_login(self)
-        self.assertTrue(login)
-        self.banner = BannerFactory()
-
-    def test_banner_view(self):
-        response = self.client.get(self.banner.get_absolute_url)
-        self.assertEqual(response.status_code, 200)
-
-
-class BannerDesignTest(TestCase):
+class BannerDesignTest(TestBase):
 
     def test_banner_design_creation(self):
         w = BannerDesignFactory()
         self.assertTrue(isinstance(w, BannerDesign))
-        self.assertEqual('BannerDesign000', w.name)
+        banner_design_list = BannerDesign.objects.all()
+        banner_design = banner_design_list[len(banner_design_list) - 1]
+        self.assertEqual(banner_design.name, w.name)
 
 
-class BannerTest(TestCase):
+class BannerDesignViewTest(TestBase):
+
+    def setUp(self):
+        super(BannerDesignViewTest, self).setUp()
+        self.banner = BannerFactory()
+
+    def test_banner_design_view(self):
+        response = self.client.get('/banner/banner_design/' +
+                                   str(self.banner.id) + '/')
+        self.assertEqual(response.status_code, 200)
+
+
+class BannerTest(TestBase):
 
     def test_banner_creation(self):
         w = BannerFactory()
         self.assertTrue(isinstance(w, Banner))
-        self.assertEqual('Banner000', w.title)
+        banner_list = Banner.objects.all()
+        banner = banner_list[len(banner_list) - 1]
+        self.assertEqual(banner.title, w.title)
 
     @skip('Falta implementar banner_new!')
     def test_banner_new(self):
@@ -82,19 +99,16 @@ class BannerTest(TestCase):
         self.assertEquals(b, ev1.banner)
 
 
-def get_login(self):
-    self.user = get_user_model().objects.create(
-        username='testuser',
-        password='12345',
-        is_active=True,
-        is_staff=True,
-        is_superuser=True
-    )
-    self.user.set_password('hello')
-    self.user.save()
-    # self.user = authenticate(username='testuser', password='hello')
-    login = self.client.login(username='testuser', password='hello')
-    return login
+class BannerViewTest(TestBase):
+
+    def setUp(self):
+        super(BannerViewTest, self).setUp()
+        self.banner = BannerFactory()
+
+    def test_banner_details_view(self):
+        response = self.client.get(self.banner.get_absolute_url)
+        self.assertEqual(response.status_code, 200)
+
 
 # class TestSignup(unittest.TestCase):
 
