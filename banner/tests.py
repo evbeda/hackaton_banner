@@ -96,6 +96,7 @@ def get_login(self):
     login = self.client.login(username='testuser', password='hello')
     return login
 
+
 # class TestSignup(unittest.TestCase):
 
 #     def setUp(self):
