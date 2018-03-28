@@ -1,52 +1,100 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
+from unittest import skip
 from django.test import TestCase
-from banner.models import Banner
-from banner.models import BannerDesign
+from banner.models import (
+    Banner,
+    BannerDesign,
+    Event,
+    EventDesign,
+)
+from banner.views import BannerView
 from django.utils import timezone
-# from django.core.urlresolvers import reverse
-# import unittest
-# from selenium import webdriver
-from .factories import UserFactory, BannerDesignFactory
+from django.contrib.auth import get_user_model
+from .factories import (
+    BannerFactory,
+    BannerDesignFactory,
+    UserFactory,
+)
 # Create your tests here.
+
+
+class ProjectTests(TestCase):
+
+    def setUp(self):
+        login = get_login(self)
+        self.assertTrue(login)
+
+    def test_homepage(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_no_banners(self):
+        response = self.client.get('/')
+        self.assertContains(response, 'No banners yet!')
+
+
+class BannerViewTest(TestCase):
+
+    def setUp(self):
+        login = get_login(self)
+        self.assertTrue(login)
+        self.banner = BannerFactory()
+
+    def test_banner_view(self):
+        response = self.client.get(self.banner.get_absolute_url)
+        self.assertEqual(response.status_code, 200)
 
 
 class BannerDesignTest(TestCase):
 
-    def create_banner_design(self, name="Banner design"):
-        return BannerDesign.objects.create(
-            user=UserFactory(),
-            name=name,
-            created=timezone.now(),
-        )
-
     def test_banner_design_creation(self):
-        w = self.create_banner_design()
+        w = BannerDesignFactory()
         self.assertTrue(isinstance(w, BannerDesign))
-        self.assertEqual("Banner design", w.name)
+        self.assertEqual('BannerDesign000', w.name)
 
 
 class BannerTest(TestCase):
 
-    def create_banner(
-            self,
-            title='Banner title',
-            description='A description',
-    ):
-        return Banner.objects.create(
-            design=BannerDesignFactory(),
-            user=UserFactory(),
-            title=title,
-            description=description,
-            created=timezone.now(),
-        )
-
-    def test_banner_design_creation(self):
-        w = self.create_banner()
+    def test_banner_creation(self):
+        w = BannerFactory()
         self.assertTrue(isinstance(w, Banner))
-        self.assertEqual("Banner title", w.title)
+        self.assertEqual('Banner000', w.title)
 
+    @skip('Falta implementar banner_new!')
+    def test_banner_new(self):
+        design = EventDesign(user=UserFactory())
+        design.save()
+        ev1 = Event(
+            start=timezone.now(),
+            end=timezone.now(),
+            design=design
+        )
+        ev2 = Event(
+            start=timezone.now(),
+            end=timezone.now(),
+            design=design
+        )
+        events = [ev1, ev2]
+        bw = BannerView()
+        b = bw.banner_new(events)
+        self.assertTrue(isinstance(b, Banner))
+        self.assertEquals(b, ev1.banner)
+
+
+def get_login(self):
+    self.user = get_user_model().objects.create(
+        username='testuser',
+        password='12345',
+        is_active=True,
+        is_staff=True,
+        is_superuser=True
+    )
+    self.user.set_password('hello')
+    self.user.save()
+    # self.user = authenticate(username='testuser', password='hello')
+    login = self.client.login(username='testuser', password='hello')
+    return login
 
 # class TestSignup(unittest.TestCase):
 

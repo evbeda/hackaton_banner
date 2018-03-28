@@ -33,6 +33,10 @@ class Banner(models.Model):
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
 
+    @property
+    def get_absolute_url(self):
+        return "/banner/banner_detail/%i/" % self.id
+
 
 class Event(models.Model):
     title = models.CharField(max_length=200)

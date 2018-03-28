@@ -2,9 +2,33 @@
 {% extends './shared/base.html' %}
 
 {% block content %}
-    <div>
-        <h1>No banners yet!</h1>
-    </div>
+  <h1>Your banners</h1>
+    {% if banners %}
+      {% for banner in banners %}
+      <div class="row">
+          <div class="col-md-8">
+            <div class="media" style="padding-top: 40px;">
+              <div class="media-body" style="padding-left:5px;">
+                <a href="{% url 'banner_detail' pk=banner.pk %}">
+                  <h4 class="media-heading">{{ banner.title }}</h4>
+                </a>
+                    <p>{{ banner.description }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="media" style="padding-top: 90px;">
+              <div class="media-body" style="padding-left:7px;">
+              </div>
+            </div>
+          </div>
+      </div>
+      {% endfor %}
+    {% else %}
+        <div>
+            <h1>No banners yet!</h1>
+        </div>
+    {% endif %}
     
     <a href="{% url 'banner_new' %}">
       <div class="glyphicon-ring glyphicon-white plus-banner-button">
