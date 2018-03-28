@@ -2,10 +2,11 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 from .views import IndexView
+from banner.views import BannerView
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^$', IndexView.as_view(), name='index'),
+    url(r'^$', BannerView.as_view(template_name='index.html'), name='index'),
     url(r'^banner/', include('banner.urls')),
     url('', include('social_django.urls', namespace='social')),
     url(r'^accounts/login/$', login, name='login'),

@@ -1,5 +1,6 @@
 from factory import (
     DjangoModelFactory,
+    Faker,
     Sequence,
     SubFactory,
     LazyFunction,
@@ -32,4 +33,16 @@ class BannerDesignFactory(DjangoModelFactory):
 
     user = SubFactory(UserFactory)
     name = Sequence(lambda n: "BannerDesign%03d" % n)
+    created = LazyFunction(timezone.now)
+
+
+class BannerFactory(DjangoModelFactory):
+    class Meta:
+        model = models.Banner
+        django_get_or_create = ('user',)
+
+    user = SubFactory(UserFactory)
+    design = SubFactory(BannerDesignFactory)
+    title = Sequence(lambda n: "Banner%03d" % n)
+    description = Faker('text')
     created = LazyFunction(timezone.now)
