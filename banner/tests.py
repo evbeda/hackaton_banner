@@ -110,6 +110,7 @@ class BannerViewTest(TestBase):
         self.assertEqual(response.status_code, 200)
 
 
+
 # class TestSignup(unittest.TestCase):
 
 #     def setUp(self):
