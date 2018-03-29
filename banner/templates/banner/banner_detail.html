@@ -4,5 +4,9 @@
 {% block content %}
 <h1>{{ banner.title }}</h1>
 <p> {{ banner.description }}
+<br>
+<a class="btn btn-primary pull-right" href="{% url 'banner_design' pk=banner.pk %}" target="blank">
+    Preview
+</a>
 {% endblock %}
 

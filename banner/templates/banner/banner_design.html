@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+{% extends '../shared/base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div class="impress-block" id="impress">
+        <div class="step slide eventbrite-banner" data-x="-10000" data-y="-6000" data-rotate="0" data-scale="1">
+          <img class="eventbrite-banner" src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
+        </div>
+        {% for event in events %}
+            <div class="step slide" data-x="1511" data-y="-2000" data-rotate="3000" data-scale="1" id="event-{{ event.id }}">
+                <div class="event-title"> {{ event.title }} </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script src="{% static 'js/impress.js' %}"></script>
+    <script>
+        var autoAdvTime = 5000; //Time to wait before advancing all other slides. (Milliseconds)
+        impress().init();
+        window.setTimeout(autoAdv, autoAdvTime);
+        function autoAdv() {
+            impress().next();
+            window.setTimeout(autoAdv,autoAdvTime);
+        }
+    </script>
+{% endblock %}

@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.contrib.auth.views import login, logout
 from .views import (
     BannerView,
+    BannerDesignView,
     BannerDetailView,
     EventsView,
 )
@@ -21,5 +22,9 @@ urlpatterns = [
     url(r'^banner_detail/(?P<pk>[0-9]+)/$',
         BannerDetailView.as_view(),
         name='banner_detail',
+        ),
+    url(r'^banner_design/(?P<pk>[0-9]+)/$',
+        BannerDesignView.as_view(),
+        name='banner_design',
         ),
 ]
