@@ -27,7 +27,7 @@ class Banner(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    design = models.ForeignKey(BannerDesign)
+    design = models.ForeignKey(BannerDesign, null=True)
     title = models.CharField(max_length=200)
     description = models.TextField()
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -40,7 +40,7 @@ class Banner(models.Model):
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(null=True)
     start = models.DateTimeField()
     end = models.DateTimeField()
     logo = models.CharField(max_length=200)
@@ -49,6 +49,6 @@ class Event(models.Model):
     custom_logo = models.CharField(max_length=200)
     custom_description = models.TextField()
     banner = models.ForeignKey(Banner)
-    design = models.ForeignKey(EventDesign)
+    design = models.ForeignKey(EventDesign, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
