@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from unittest import skip
+from django.contrib.auth import get_user_model
 from django.test import TestCase
-from banner.models import (
+from django.utils import timezone
+from unittest import skip
+from .factories import (
+    BannerDesignFactory,
+    BannerFactory,
+    UserFactory,
+)
+from .models import (
     Banner,
     BannerDesign,
     Event,
     EventDesign,
 )
-from banner.views import BannerView
-from django.utils import timezone
-from django.contrib.auth import get_user_model
-from .factories import (
-    BannerFactory,
-    BannerDesignFactory,
-    UserFactory,
-)
+from .views import BannerView
 
 
 class TestBase(TestCase):
@@ -64,8 +64,9 @@ class BannerDesignViewTest(TestBase):
         self.banner = BannerFactory()
 
     def test_banner_design_view(self):
-        response = self.client.get('/banner/banner_design/' +
-                                   str(self.banner.id) + '/')
+        response = self.client.get('/banner/' +
+                                   str(self.banner.id) +
+                                   '/banner_design/')
         self.assertEqual(response.status_code, 200)
 
 
@@ -99,13 +100,13 @@ class BannerTest(TestBase):
         self.assertEquals(b, ev1.banner)
 
 
-class BannerViewTest(TestBase):
+class BannerDetailViewTest(TestBase):
 
     def setUp(self):
-        super(BannerViewTest, self).setUp()
+        super(BannerDetailViewTest, self).setUp()
         self.banner = BannerFactory()
 
-    def test_banner_details_view(self):
+    def test_banner_detail_view(self):
         response = self.client.get(self.banner.get_absolute_url)
         self.assertEqual(response.status_code, 200)
 
