@@ -7,6 +7,7 @@ from unittest import skip
 from .factories import (
     BannerDesignFactory,
     BannerFactory,
+    EventFactory,
     UserFactory,
 )
 from .models import (
@@ -69,6 +70,20 @@ class BannerDesignViewTest(TestBase):
                                    '/banner_design/')
         self.assertEqual(response.status_code, 200)
 
+    def test_events_inside_banner(self):
+        event1 = EventFactory.build()
+        event1.banner = self.banner
+        event1.save()
+
+        event2 = EventFactory.build()
+        event2.banner = self.banner
+        event2.save()
+
+        response = self.client.get('/banner/' +
+                                   str(self.banner.id) +
+                                   '/banner_design/')
+        self.assertContains(response, 'event-' + str(event1.id))
+        self.assertContains(response, 'event-' + str(event2.id))
 
 class BannerTest(TestBase):
 

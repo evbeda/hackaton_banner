@@ -46,3 +46,18 @@ class BannerFactory(DjangoModelFactory):
     title = Sequence(lambda n: "Banner%03d" % n)
     description = Faker('text')
     created = LazyFunction(timezone.now)
+
+
+class EventFactory(DjangoModelFactory):
+    class Meta:
+        model = models.Event
+        django_get_or_create = ('user',)
+
+    title = Sequence(lambda n: "Event%03d" % n)
+    description = Faker('text')
+    start = LazyFunction(timezone.now)
+    end = LazyFunction(timezone.now)
+    custom_title = 'none'
+    custom_logo = 'none'
+    custom_description = 'none'
+    created = LazyFunction(timezone.now)

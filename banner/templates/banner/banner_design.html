@@ -6,16 +6,21 @@
         <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1">
             <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
         </div>
-        {% for event in events %}
-            <div class="step slide" data-x="-2000" data-y="-200" data-rotate="100" data-scale="1" id="event-{{ event.id }}">
-                <div class="event-title"> {{ event.title }} </div>
-                <p> {{ event.description }}</p>
+        {% for event_data in events_data %}
+        <div class="step slide" data-x="{{ event_data.data_x }}"
+                                data-y="{{ event_data.data_y }}"
+                                data-rotate="{{ event_data.data_rotate }}"
+                                data-scale="{{ event_data.data_scale }}"
+                                id="event-{{ event_data.event.id }}">
+                <div class="eventbrite-banner"><img src="{{ event_data.event.logo }}" /></div>
+                <div class="event-title"> {{ event_data.event.title }} </div>
+                <p> {{ event_data.event.description }}</p>
             </div>
         {% endfor %}
     </div>
     <script src="{% static 'js/impress.js' %}"></script>
     <script>
-        var autoAdvTime = 3000; //Time to wait before advancing all other slides. (Milliseconds)
+        var autoAdvTime = 3000; //time to wait before advancing all other slides. (milliseconds)
         impress().init();
         window.setTimeout(autoAdv, autoAdvTime);
         function autoAdv() {
