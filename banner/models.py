@@ -35,7 +35,7 @@ class Banner(models.Model):
 
     @property
     def get_absolute_url(self):
-        return "/banner/banner_detail/%i/" % self.id
+        return "/banner/%i/banner_detail/" % self.id
 
 
 class Event(models.Model):

@@ -71,6 +71,7 @@ class EventsView(FormView, LoginRequiredMixin):
                         even1.start = event['start']['local']
                         even1.end = event['end']['local']
                         even1.organizer = event['organizer_id']
+                        even1.logo = event['logo']['url']
                         even1.custom_title = 'none'
                         even1.custom_logo = 'none'
                         even1.custom_description = 'none'

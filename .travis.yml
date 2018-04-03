@@ -20,3 +20,6 @@ before_script:
 script:
  - python manage.py migrate
  - coverage run manage.py test
+
+after_success:
+  - coveralls

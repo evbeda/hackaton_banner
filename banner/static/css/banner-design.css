@@ -6,7 +6,6 @@
 #qrcode img{
     width: 50%;
 }
-
 .eventbrite-logo{
 	width: 100%;
 }
@@ -18,8 +17,6 @@
     border: 1px solid #CCD0DB;
 }
 .step {
-  position: relative;
-  margin: 0 auto;
   -webkit-box-sizing: border-box;
   -moz-box-sizing:    border-box;
   -ms-box-sizing:     border-box;
@@ -28,11 +25,11 @@
   line-height: 1.5;
 }
 .slide {
+  height: 810px;
+  width: 1440px;
   display: block;
-  width: 1400px;
-  height: 800px;
-  padding-top: 200px;
-  background: white;
+  padding: 0px;
+  background-color: white;
   border: 1px solid rgba(0, 0, 0, .3);
   border-radius: 10px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
@@ -59,7 +56,6 @@
   padding: 20px;
   text-align: center;
   color: #007481;
-
 }
 .event-qr{
   padding: 20px;
@@ -91,17 +87,15 @@
 }
 .eventbrite-banner{
   border: 0px;
-  box-shadow: none;
-  background: white;
+}
+.eventbrite-banner img{
   display: block;
   margin-left: auto;
   margin-right: auto;
-}
-.eventbrite-banner img{
-    width: 70%;
-    position: relative;
-    top: 250;
-    left: 200;
+  width: 50%;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 }
 .event-logo{
 	width: 100%;
@@ -133,8 +127,4 @@
 }
 .event-location-line-two{
   color: #666A73;
-}
-.impress-block{
-  padding-top: 300px;
-  padding-left: 20px;
 }
