@@ -18,6 +18,9 @@ from .models import (
 from .forms import EventSelected
 
 
+DEFAULT_BANNER_DESIGN = 1
+
+
 @method_decorator(login_required, name='dispatch')
 class EventsView(FormView, LoginRequiredMixin):
 
@@ -34,7 +37,6 @@ class EventsView(FormView, LoginRequiredMixin):
         eventbrite = Eventbrite(access_token)
         self.events = eventbrite.get('/users/me/events/')['events']
 
-
     def get_form(self):
         form = super(EventsView, self).get_form()
         if not self.form_init:
@@ -45,7 +47,7 @@ class EventsView(FormView, LoginRequiredMixin):
 
     def form_valid(self, form, *args, **kwargs):
         if any(form.cleaned_data.values()):
-            design = BannerDesign.objects.create(user=self.request.user)
+            design = BannerDesign.objects.get(id=DEFAULT_BANNER_DESIGN)
             banner = Banner.objects.create(
                 design=design,
                 user=self.request.user,
