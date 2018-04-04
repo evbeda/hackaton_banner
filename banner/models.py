@@ -17,7 +17,11 @@ class BannerDesign(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    name = models.CharField(default='horizontal layout', max_length=200, null=True)
+    name = models.CharField(
+        default='horizontal layout',
+        max_length=200,
+        null=True
+    )
     data_x = models.IntegerField(default=-2000, null=True)
     data_y = models.IntegerField(default=0, null=True)
     data_z = models.IntegerField(default=0, null=True)
