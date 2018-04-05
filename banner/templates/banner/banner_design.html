@@ -1,7 +1,16 @@
 <!DOCTYPE html>
-{% extends '../shared/base.html' %}
 {% load staticfiles %}
-{% block content %}
+{% load qr_tags %}
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{{ banner.title }}</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/banner-design.css' %}">
+  </head>
+  <body>
     <div id="impress">
         <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1">
             <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
@@ -12,9 +21,35 @@
                                 data-rotate="{{ event_data.data_rotate }}"
                                 data-scale="{{ event_data.data_scale }}"
                                 id="event-{{ event_data.event.id }}">
-                <div class="eventbrite-banner"><img src="{{ event_data.event.logo }}" /></div>
-                <div class="event-title"> {{ event_data.event.title }} </div>
-                <p> {{ event_data.event.description }}</p>
+                <div class="event-logo">
+                  {% if event_data.event.custom_logo %}
+                    <img src="{{ event_data.event.custom_logo }}" />
+                  {% else %}
+                    <img src="{{ event_data.event.logo }}" />
+                  {% endif %}
+                </div>
+                  {% if event_data.event.custom_title %}
+                    <div class="event-title"> {{ event_data.event.custom_title }} </div>
+                  {% else %}
+                    <div class="event-title"> {{ event_data.event.title }} </div>
+                  {% endif %}
+                  <div class="event-start-date">
+                    {{ event_data.event.start }}
+                  </div>
+                  <div class="row">
+                     <div class="col-md-6">
+                       {% if event_data.event.custom_description %}
+                         <div class="event-description"> {{ event_data.event.custom_description }}</div>
+                       {% else %}
+                         <div class="event-description"> {{ event_data.event.description }}</div>
+                       {% endif %}
+                     </div> 
+                     <div class="col-md-6">
+                       <div class="event-qr">
+                         {% qr_from_object event_data.event "m" %}
+                       </div>
+                     </div>
+                  </div>
             </div>
         {% endfor %}
     </div>
@@ -28,4 +63,5 @@
             window.setTimeout(autoAdv,autoAdvTime);
         }
     </script>
-{% endblock %}
+  </body>
+</html>

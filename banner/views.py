@@ -164,6 +164,7 @@ class BannerDesignView(TemplateView, LoginRequiredMixin):
         events_data = [
             event for event in self.get_events_data(events, banner)
         ]
+        context['banner'] = banner
         context['events_data'] = events_data
         return context
 

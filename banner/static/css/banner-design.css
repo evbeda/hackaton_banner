@@ -2,12 +2,26 @@
    font-family: BentonSansRegular;
    src: url(fonts/BentonSans-Regular_sOT.otf);
 }
-
+body {
+  background: black;
+}
 #qrcode img{
     width: 50%;
 }
 .eventbrite-logo{
 	width: 100%;
+}
+.event-logo{
+  /* width: 100%; */
+}
+.event-logo img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60vw;
+  height: 40vh;
+  padding-top: 20px;
+  position: relative;
 }
 .box-lateral{
     border-right: 1px solid #CCD0DB;
@@ -25,8 +39,8 @@
   line-height: 1.5;
 }
 .slide {
-  height: 100vh;
-  width: 100vw;
+  height: 99vh;
+  width: 99vw;
   display: block;
   padding: 0px;
   background-color: white;
@@ -36,13 +50,13 @@
 }
 .event-title{
   text-align: center;
-  font-size: 100px;
+  font-size: 60px;
   font-family: 'Lucila Console', Monaco, monospace;
+  margin-top: 10px;
 }
 .event-tiny-url{
   font-size: 50px;
   margin-top: 10px;
-
 }
 .buy-tickets-label{
   text-align: center;
@@ -58,14 +72,19 @@
   color: #007481;
 }
 .event-qr{
-  padding: 20px;
-  padding-bottom: 30px;
+  /* padding: 20px; */
+  /* padding-bottom: 30px; */
 }
 .event-qr img{
-  margin: auto;
-  width: 50%;
-  padding-top: 10px;
-  padding-bottom:10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 40%;
+  position: relative;
+  /* margin: auto; */
+  /* width: 50%; */
+  /* padding-top: 10px; */
+  /* padding-bottom:10px; */
 }
 .event-range-price{
   position: relative;
@@ -97,9 +116,6 @@
   top: 50%;
   transform: translateY(-50%);
 }
-.event-logo{
-	width: 100%;
-}
 .div-logo{
   padding: 0px !important;
 }
@@ -111,15 +127,17 @@
   color: #282C35
 }
 .event-start-date{
-    font-size: 18px;
-    color: #45494E;
+  font-size: 15px;
+  color: #45494E;
+  margin-left: 80px;
 }
 .event-description{
-  margin-top: 50px;
-  font-size: 32px;
+  margin-top: 10px;
+  font-size: 25px;
   color: #45494E;
   height: 295px;
-
+  font-family: 'Lucila Console', Monaco, monospace;
+  margin-left: 80px;
 }
 .event-hastags{
   font-size: 24px;
