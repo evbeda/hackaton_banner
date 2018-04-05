@@ -37,7 +37,6 @@ class EventsView(FormView, LoginRequiredMixin):
         eventbrite = Eventbrite(access_token)
         self.events = eventbrite.get('/users/me/events/')['events']
 
-    '''trying formset'''
     def get_context_data(self, **kwargs):
         context = super(EventsView, self).get_context_data(**kwargs)
         access_token = self.request.user.social_auth.all()[0].access_token
@@ -50,18 +49,20 @@ class EventsView(FormView, LoginRequiredMixin):
                 logo = event['logo']['url']
             else:
                 logo = 'none'
-            #import ipdb; ipdb.set_trace()
-            data = {'title': event['name']['text'],
-                    'description': event['description']['text'],
-                    'start': event['start']['local'],
-                    'end': event['end']['local'],
-                    'organizer': event['organizer_id'],
-                    'event_id': event['id'],
-                    'logo': logo,
-                    }
+
+            data = {
+                'title': event['name']['text'],
+                'description': event['description']['text'],
+                'start': event['start']['local'],
+                'end': event['end']['local'],
+                'organizer': event['organizer_id'],
+                'event_id': event['id'],
+                'logo': logo,
+            }
             data_event.append(data)
-        event_formset = formset_factory(EventSelected, max_num=len(self.events))
-        # import ipdb; ipdb.set_trace()
+        event_formset = formset_factory(
+            EventSelected, max_num=len(self.events))
+
         formset = event_formset(initial=data_event)
         return {'formset': formset}
 
@@ -72,10 +73,12 @@ class EventsView(FormView, LoginRequiredMixin):
             formset = event_formset(request.POST, request.FILES)
             if formset.is_valid():
                 self.get_initial()
-                # import ipdb; ipdb.set_trace()
+
                 for i in range(len(formset.cleaned_data)):
-                    if formset.cleaned_data[i]['selection']: # any
-                        design = BannerDesign.objects.create(user=self.request.user)
+                    if formset.cleaned_data[i]['selection']:
+                        design = BannerDesign.objects.create(
+                            user=self.request.user
+                        )
                         banner = Banner.objects.create(
                             design=design,
                             user=self.request.user,
@@ -88,10 +91,7 @@ class EventsView(FormView, LoginRequiredMixin):
                 for i in range(len(formset.cleaned_data)):
                     if formset.cleaned_data[i]['selection']:
                         for event in self.events:
-                            #import ipdb; ipdb.set_trace()
                             if event['id'] == formset.cleaned_data[i]['event_id']:
-
-
                                 edesign = EventDesign.objects.create(
                                     user=self.request.user,
                                 )
@@ -109,7 +109,9 @@ class EventsView(FormView, LoginRequiredMixin):
                                     logo = 'none'
                                 even1.logo = logo
                                 even1.event_id = event['id']
-
+                                even1.custom_title = formset.cleaned_data[i]['title']
+                                even1.custom_description = formset.cleaned_data[i]['description']
+                                even1.custom_logo = formset.cleaned_data[i]['logo']
                                 even1.save()
                 return super(EventsView, self).form_valid(formset, *args, **kwargs)
 
@@ -159,18 +161,13 @@ class BannerDesignView(TemplateView, LoginRequiredMixin):
                 )
             )
         ]
-
         events_data = [
             event for event in self.get_events_data(events, banner)
         ]
-
-        context['banner'] = banner
         context['events_data'] = events_data
-
         return context
 
     def get_events_data(self, events, banner):
-
         for event in events:
             yield {
                 'data_x': (event[0] + 1) * banner.design.data_x,
@@ -180,5 +177,3 @@ class BannerDesignView(TemplateView, LoginRequiredMixin):
                 'data_scale': banner.design.data_scale,
                 'event': event[1],
             }
-
-

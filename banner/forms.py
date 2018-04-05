@@ -10,9 +10,7 @@ class EventSelected(forms.Form):
     organizer = forms.HiddenInput()
     logo = forms.CharField(initial='logo', required=False)
     selection = forms.BooleanField(required=False)
+    custom_title = forms.CharField(required=False)
+    custom_description = forms.CharField(required=False)
+    custom_logo = forms.CharField(initial='logo', required=False)
     event_id = forms.CharField(required=False)
-
-    # def add_event(self, event):
-    #     self.fields[event['id']] = forms.BooleanField(required=False)
-
-        #self.fields[event['name']['text']] = forms.BooleanField(required=False)
