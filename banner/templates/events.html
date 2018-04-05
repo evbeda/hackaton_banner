@@ -5,7 +5,7 @@
 {% block content %}
   <h1>Your events</h1>
       <h3>Select your events for create a new banner</h3>
-  <form action="" method="post">
+  <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ formset.management_form }}
 
@@ -67,7 +67,7 @@
       </div>
       <div class="col-md-6">
         <h4 style="color:lightgreen;font-family:verdana">Edit Logo:</h4>
-        <h4>{{ form.logo }}</h4>
+        <h4>{{ form.custom_logo }}</h4>
          <!-- <h3>{{ form.logo.url }}</h3> -->
       </div>
     </div>

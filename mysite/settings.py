@@ -153,11 +153,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-#FileField
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+#FILEFIELD
 MEDIA_URL = '/media/'
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DB_FROM_ENV = dj_database_url.config(conn_max_age=500)
 

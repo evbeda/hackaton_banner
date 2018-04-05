@@ -51,15 +51,15 @@ class Banner(models.Model):
 
 
 class Event(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=1000)
     description = models.TextField(null=True)
     start = models.DateTimeField()
     end = models.DateTimeField()
-    logo = models.CharField(max_length=1000)
+    logo = models.CharField(max_length=5000)
     organizer = models.CharField(max_length=200)
-    custom_title = models.CharField(max_length=200)
-    custom_logo = models.FileField()
-    custom_description = models.TextField()
+    custom_title = models.CharField(max_length=1000)
+    custom_logo = models.FileField(upload_to='custom_logo/')
+    custom_description = models.TextField(null=True)
     banner = models.ForeignKey(Banner)
     design = models.ForeignKey(EventDesign, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
