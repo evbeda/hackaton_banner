@@ -1,8 +1,16 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
+from django.forms import inlineformset_factory
+from .models import (
+    Banner,
+    Event,
+)
 
+class EventSelectedForm(forms.Form):
 
-class EventSelected(forms.Form):
+    class Meta:
+        model = Event
+        exclude = ()
 
     title = forms.CharField(required=False)
     description = forms.CharField(required=False)
@@ -20,3 +28,15 @@ class EventSelected(forms.Form):
             FileExtensionValidator(allowed_extensions=['jpg', 'png', 'jpeg'])
         ]
     )
+
+
+class BannerForm(forms.ModelForm):
+    class Meta:
+        model = Banner
+        exclude = ('user',)
+
+EventSelectedFormSet = inlineformset_factory(
+    Banner,
+    Event,
+    form=EventSelectedForm, extra=1
+)

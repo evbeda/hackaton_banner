@@ -1,37 +1,36 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import NON_FIELD_ERRORS
+from django.core.files.storage import FileSystemStorage
+from django.core.urlresolvers import reverse_lazy
+from django.forms import formset_factory
+from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.utils.decorators import method_decorator
-from django.views.generic.edit import FormView
+from django.views.generic.edit import (
+    CreateView,
+)
 from eventbrite import Eventbrite
+from .forms import EventSelectedForm
 from .models import (
     Banner,
     BannerDesign,
     Event,
     EventDesign,
 )
-from .forms import EventSelected
-
-from django.forms import formset_factory
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.core.files.storage import FileSystemStorage
-from django.core.exceptions import ValidationError
-from django import forms
-from django.core.urlresolvers import reverse_lazy
 
 
 DEFAULT_BANNER_DESIGN = 1
 
 
 @method_decorator(login_required, name='dispatch')
-class EventsView(FormView, LoginRequiredMixin):
+class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
 
-    form_class = forms.Form
+    model = Banner
+    fields = ['title', 'description']
     template_name = "events/events.html"
-    success_url = reverse_lazy('')
+    success_url = reverse_lazy('index')
 
     def get_initial(self):
         access_token = self.request.user.social_auth.all()[0].access_token
@@ -39,7 +38,10 @@ class EventsView(FormView, LoginRequiredMixin):
         self.events = eventbrite.get('/users/me/events/')['events']
 
     def get_context_data(self, **kwargs):
-        context = super(EventsView, self).get_context_data(**kwargs)
+        context = super(
+            BannerNewEventsSelectedCreateView,
+            self
+        ).get_context_data(**kwargs)
         access_token = self.request.user.social_auth.all()[0].access_token
         eventbrite = Eventbrite(access_token)
         self.events = eventbrite.get('/users/me/events/')['events']
@@ -62,7 +64,7 @@ class EventsView(FormView, LoginRequiredMixin):
             }
             data_event.append(data)
         event_formset = formset_factory(
-            EventSelected, max_num=len(self.events))
+            EventSelectedForm, max_num=len(self.events))
 
         context['formset'] = event_formset(initial=data_event)
         return context
@@ -70,13 +72,12 @@ class EventsView(FormView, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         form = self.get_form()
         if form.is_valid():
-            event_formset = formset_factory(EventSelected)
+            event_formset = formset_factory(EventSelectedForm)
             formset = event_formset(request.POST, request.FILES)
             if not any([
-                selection_cleaned_data['selection']
-                for selection_cleaned_data in formset.cleaned_data
+                    selection_cleaned_data['selection']
+                    for selection_cleaned_data in formset.cleaned_data
             ]):
-                from django.core.exceptions import NON_FIELD_ERRORS
                 form.add_error(NON_FIELD_ERRORS, 'No event selected')
                 return self.form_invalid(form)
             return self.form_valid(form, formset)
@@ -85,23 +86,23 @@ class EventsView(FormView, LoginRequiredMixin):
 
     def form_valid(self, form, formset):
         self.get_initial()
-        for i in range(len(formset.cleaned_data)):
-            if formset.cleaned_data[i]['selection']:
-                design = BannerDesign.objects.create(
-                    user=self.request.user
-                )
-                banner = Banner.objects.create(
-                    design=design,
-                    user=self.request.user,
-                )
-                banner.description = 'This is the new banner'
-                banner.title = 'New banner'
-                banner.save()
-                break
-        for i in range(len(formset.cleaned_data)):
-            if formset.cleaned_data[i]['selection']:
-                for event in self.events:
-                    if event['id'] == formset.cleaned_data[i]['event_id']:
+        form.instance.user = self.request.user
+        selected_events = [
+            formset.cleaned_data[i] for i in
+            range(len(formset.cleaned_data))
+            if formset.cleaned_data[i]['selection']
+        ]
+        if any(selected_events):
+            design = BannerDesign.objects.get(
+                id=DEFAULT_BANNER_DESIGN
+            )
+            banner = form.save(commit=True)
+            banner.design = design
+            banner.save()
+
+            for event in self.events:
+                for selected in selected_events:
+                    if event['id'] == selected['event_id']:
                         edesign = EventDesign.objects.create(
                             user=self.request.user,
                         )
@@ -115,23 +116,27 @@ class EventsView(FormView, LoginRequiredMixin):
                         even1.end = event['end']['local']
                         if event['logo'] is not None:
                             logo = event['logo']['url']
-                        else:
-                            logo = 'none'
                         even1.logo = logo
                         even1.event_id = event['id']
-                        if formset.cleaned_data[i]['custom_title'] is not None:
-                            custom_title = formset.cleaned_data[i]['title']
-                        else:
-                            custom_title = 'none'
-                        even1.custom_title = custom_title
-                        if formset.cleaned_data[i]['custom_description'] is not None:
-                            custom_description = formset.cleaned_data[i]['description']
-                        else:
-                            custom_description = 'none'
-                        even1.custom_description = custom_description
-
+                        even1.custom_title = selected['title']
+                        even1.custom_description = selected['description']
+                        if selected['custom_logo'] is not None:
+                            fs = FileSystemStorage()
+                            filename = fs.save(
+                                selected['custom_logo'].name,
+                                selected['custom_logo']
+                            )
+                            even1.custom_logo = fs.url(filename)
                         even1.save()
-        return super(EventsView, self).form_valid(form)
+            return super(
+                BannerNewEventsSelectedCreateView,
+                self,
+            ).form_valid(form)
+
+
+class BannerCreateView(CreateView):
+    model = Banner
+    fields = ['first_name', 'last_name']
 
 
 @method_decorator(login_required, name='dispatch')
