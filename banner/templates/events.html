@@ -7,85 +7,85 @@
       <h3>Select your events for create a new banner</h3>
   <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ form }}
     {{ formset.management_form }}
 
-    {% for form in formset %}
+    {% for event_form in formset %}
 
-    {{ form.id }}
-    <div class="row">
-      <div class="col-md-2">
-        <h4 style="color:red;font-family:verdana">Title:</h4>
-      </div>
-      <div class="col-md-4" >
-      <h4>{{ form.title.value }}</h4>
-      </div>
-      <div class="col-md-6">
-        <h4 style="color:lightgreen;font-family:verdana">Edit Title:</h4>
-        <h4>{{ form.title }}</h4>
-      </div>
-    </div>
+        {{ event_form.id }}
+        <div class="row">
+          <div class="col-md-2">
+            <h4 style="color:red;font-family:verdana">Title:</h4>
+          </div>
+          <div class="col-md-4" >
+          <h4>{{ event_form.title.value }}</h4>
+          </div>
+          <div class="col-md-6">
+            <h4 style="color:lightgreen;font-family:verdana">Edit Title:</h4>
+            <h4>{{ event_form.title }}</h4>
+          </div>
+        </div>
 
-    <div class="row">
-      <div class="col-md-2">
-        <h4 style="color:red;font-family:verdana" >Description:</h4>
-      </div>
-      <div class="col-md-4" >
-        <h4>{{ form.description.value }}</h4>
-      </div>
-      <div class="col-md-6">
-        <h4 style="color:lightgreen;font-family:verdana">Edit Description:</h4>
-        <h4>{{ form.description }}</h4>
-      </div>
-    </div>
+        <div class="row">
+          <div class="col-md-2">
+            <h4 style="color:red;font-family:verdana" >Description:</h4>
+          </div>
+          <div class="col-md-4" >
+            <h4>{{ event_form.description.value }}</h4>
+          </div>
+          <div class="col-md-6">
+            <h4 style="color:lightgreen;font-family:verdana">Edit Description:</h4>
+            <h4>{{ event_form.description }}</h4>
+          </div>
+        </div>
 
-    <div class="row">
-      <div class="col-md-2">
-        <h4 style="color:red;font-family:verdana" >Start:</h4>
-      </div>
-      <div class="col-md-4" >
-        <h4>{{ form.start.value }}</h4>
-      </div>
-       <div class="col-md-6" ></div>
+        <div class="row">
+          <div class="col-md-2">
+            <h4 style="color:red;font-family:verdana" >Start:</h4>
+          </div>
+          <div class="col-md-4" >
+            <h4>{{ event_form.start.value }}</h4>
+          </div>
+           <div class="col-md-6" ></div>
 
-    </div>
-    <div class="row">
-      <div class="col-md-2">
-        <h4 style="color:red;font-family:verdana" >End:</h4>
-      </div>
-      <div class="col-md-4" >
-        <h4>{{ form.end.value }}</h4>
-      </div>
-      <div class="col-md-6" ></div>
-    </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2">
+            <h4 style="color:red;font-family:verdana" >End:</h4>
+          </div>
+          <div class="col-md-4" >
+            <h4>{{ event_form.end.value }}</h4>
+          </div>
+          <div class="col-md-6" ></div>
+        </div>
 
-    <div class="row">
-      <div class="col-md-2">
-        <h4 style="color:red;font-family:verdana" >Logo:</h4>
-      </div>
-      <div class="col-md-4" >
-        <img src={{ form.logo.value }}>
-      </div>
-      <div class="col-md-6">
-        <h4 style="color:lightgreen;font-family:verdana">Edit Logo:</h4>
-        <h4>{{ form.custom_logo }}</h4>
-         <!-- <h3>{{ form.logo.url }}</h3> -->
-      </div>
-    </div>
+        <div class="row">
+          <div class="col-md-2">
+            <h4 style="color:red;font-family:verdana" >Logo:</h4>
+          </div>
+          <div class="col-md-4" >
+            <img src={{ event_form.logo.value }}>
+          </div>
+          <div class="col-md-6">
+            <h4 style="color:lightgreen;font-family:verdana">Edit Logo:</h4>
+            <h4>{{ event_form.custom_logo }}</h4>
+          </div>
+        </div>
 
-    <div class="row">
-      <div class="col-md-4">
-      </div>
-      <div class="col-md-8" ></div>
-      <h4 hidden="">{{ form.event_id }}</h4>
-    </div>
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-8" ></div>
+          <h4 hidden="">{{ event_form.event_id }}</h4>
+        </div>
 
 
-    <div>
-    <div class="row">
-      <div class="col-md-12">
-        <h4 style="color:blue; font-size:200%">Select Event {{ form.selection }}</h4>
-      </div>
-      </div>
+        <div>
+        <div class="row">
+          <div class="col-md-12">
+            <h4 style="color:blue; font-size:200%">Select Event {{ event_form.selection }}</h4>
+          </div>
+          </div>
 
     {% endfor %}
 
