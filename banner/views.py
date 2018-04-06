@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.utils.decorators import method_decorator
 from django.views.generic.edit import FormView
-from django.utils import timezone
-from django.shortcuts import redirect
 from eventbrite import Eventbrite
 from .models import (
     Banner,
