@@ -85,6 +85,7 @@ class BannerDesignViewTest(TestBase):
         self.assertContains(response, 'event-' + str(event1.id))
         self.assertContains(response, 'event-' + str(event2.id))
 
+
 class BannerTest(TestBase):
 
     def test_banner_creation(self):
@@ -124,6 +125,14 @@ class BannerDetailViewTest(TestBase):
     def test_banner_detail_view(self):
         response = self.client.get(self.banner.get_absolute_url)
         self.assertEqual(response.status_code, 200)
+
+
+# class SelectionEventsViewTest(TestBase):
+
+#     def comprobation_event_selected(self):
+#             self.post()
+#             if not formset.cleaned_data[i]['selection']:
+
 
 
 
