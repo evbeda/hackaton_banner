@@ -4,15 +4,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.storage import FileSystemStorage
 from django.core.urlresolvers import reverse_lazy
-from django.forms import formset_factory
+from django.db import IntegrityError, transaction
+from django.forms import modelformset_factory
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
+from django.shortcuts import render
 from django.views.generic.edit import (
     CreateView,
 )
 from eventbrite import Eventbrite
-from .forms import EventSelectedForm
+from . import forms
 from .models import (
     Banner,
     BannerDesign,
@@ -27,8 +29,7 @@ DEFAULT_BANNER_DESIGN = 1
 @method_decorator(login_required, name='dispatch')
 class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
 
-    model = Banner
-    fields = ['title', 'description']
+    form_class = forms.BannerForm
     template_name = "events/events.html"
     success_url = reverse_lazy('index')
 
@@ -56,82 +57,90 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             data = {
                 'title': event['name']['text'],
                 'description': event['description']['text'],
-                'start': event['start']['local'],
-                'end': event['end']['local'],
+                'start': event['start']['local'].replace('T', ' '),
+                'end': event['end']['local'].replace('T', ' '),
                 'organizer': event['organizer_id'],
-                'event_id': event['id'],
+                'evb_id': event['id'],
                 'logo': logo,
             }
             data_event.append(data)
-        event_formset = formset_factory(
-            EventSelectedForm, max_num=len(self.events))
 
-        context['formset'] = event_formset(initial=data_event)
+        EventFormSet = modelformset_factory(
+            Event,
+            form=forms.EventForm,
+            extra=len(data_event),
+        )
+
+        formset = EventFormSet(
+            initial=data_event,
+            queryset=Event.objects.none(),
+        )
+        context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            event_formset = formset_factory(EventSelectedForm)
-            formset = event_formset(request.POST, request.FILES)
-            if not any([
-                    selection_cleaned_data['selection']
-                    for selection_cleaned_data in formset.cleaned_data
-            ]):
+        form = forms.BannerForm(
+            request.POST,
+        )
+
+        EventFormSet = modelformset_factory(
+            Event,
+            form=forms.EventForm,
+        )
+
+        formset = EventFormSet(
+            request.POST,
+            request.FILES,
+            queryset=Event.objects.none(),
+        )
+        if form.is_valid() and formset.is_valid():
+            if not formset.cleaned_data:
                 form.add_error(NON_FIELD_ERRORS, 'No event selected')
-                return self.form_invalid(form)
+                return render(
+                    request,
+                    'events.html',
+                    {'form': form, 'formset': formset}
+                )
             return self.form_valid(form, formset)
         else:
             return self.form_invalid(form)
 
+    @transaction.atomic
     def form_valid(self, form, formset):
-        self.get_initial()
         form.instance.user = self.request.user
-        selected_events = [
-            formset.cleaned_data[i] for i in
-            range(len(formset.cleaned_data))
-            if formset.cleaned_data[i]['selection']
-        ]
-        if any(selected_events):
-            design = BannerDesign.objects.get(
-                id=DEFAULT_BANNER_DESIGN
-            )
-            banner = form.save(commit=True)
-            banner.design = design
-            banner.save()
+        banner = form.save(commit=False)
+        events = formset.save(commit=False)
+        try:
+            with transaction.atomic():
+                b_design = BannerDesign.objects.get(
+                    id=DEFAULT_BANNER_DESIGN,
+                )
+                banner.design = b_design
+                banner.save()
 
-            for event in self.events:
-                for selected in selected_events:
-                    if event['id'] == selected['event_id']:
-                        edesign = EventDesign.objects.create(
-                            user=self.request.user,
-                        )
-                        edesign.save()
-                        even1 = Event()
-                        even1.banner = banner
-                        even1.design = edesign
-                        even1.title = event['name']['text']
-                        even1.description = event['description']['text']
-                        even1.start = event['start']['local']
-                        even1.end = event['end']['local']
-                        if event['logo'] is not None:
-                            logo = event['logo']['url']
-                        even1.logo = logo
-                        even1.event_id = event['id']
-                        even1.custom_title = selected['title']
-                        even1.custom_description = selected['description']
-                        if selected['custom_logo'] is not None:
+                e_design = EventDesign.objects.create(
+                    user=self.request.user,
+                )
+
+                for event in events:
+                    if event is not None:
+                        event.banner = banner
+                        event.design = e_design
+                        if event.custom_logo:
                             fs = FileSystemStorage()
                             filename = fs.save(
-                                selected['custom_logo'].name,
-                                selected['custom_logo']
+                                event.custom_logo.name,
+                                event.custom_logo
                             )
-                            even1.custom_logo = fs.url(filename)
-                        even1.save()
-            return super(
-                BannerNewEventsSelectedCreateView,
-                self,
-            ).form_valid(form)
+                            event.custom_logo = fs.url(filename)
+                        event.save()
+        except IntegrityError as e:
+            print e.message
+
+        return super(
+            BannerNewEventsSelectedCreateView,
+            self,
+        ).form_valid(form)
 
 
 class BannerCreateView(CreateView):
@@ -155,7 +164,7 @@ class BannerDetailView(DetailView, LoginRequiredMixin):
 
     model = Banner
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         banner = Banner.objects.get(id=self.kwargs['pk'])
         return banner
 
