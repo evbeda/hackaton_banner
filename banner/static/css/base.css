@@ -91,3 +91,9 @@ h1, h2, h3, h4 {
   height: 50px;
   width: 200px;
 }
+hr {
+  margin:20px 0px 20px 0p;
+  padding:0px;
+  border:0;
+  border-bottom:2px solid #f66a26;
+}

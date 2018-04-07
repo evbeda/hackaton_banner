@@ -1,42 +1,66 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
-from django.forms import inlineformset_factory
+from django.forms import modelformset_factory
 from .models import (
     Banner,
     Event,
 )
 
-class EventSelectedForm(forms.Form):
+
+class EventForm(forms.ModelForm):
+
+    selection = forms.BooleanField(required=False)
+    evb_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    custom_title = forms.CharField(required=False)
+    custom_description = forms.CharField(required=False)
+    custom_logo = forms.FileField(required=False)
+    start = forms.DateTimeField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    end = forms.DateTimeField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    organizer = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    title = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    logo = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
 
     class Meta:
         model = Event
-        exclude = ()
+        exclude = ('design', 'banner',)
 
-    title = forms.CharField(required=False)
-    description = forms.CharField(required=False)
-    start = forms.CharField(required=False)
-    end = forms.CharField(required=False)
-    organizer = forms.HiddenInput()
-    logo = forms.CharField(initial='logo', required=False)
-    selection = forms.BooleanField(required=False)
-    event_id = forms.CharField(required=False)
-    custom_title = forms.CharField(required=False)
-    custom_description = forms.CharField(required=False)
-    custom_logo = forms.FileField(
-        required=False,
-        validators=[
-            FileExtensionValidator(allowed_extensions=['jpg', 'png', 'jpeg'])
-        ]
-    )
-
+    def save(self, commit=True):
+        m = super(EventForm, self).save(commit=False)
+        cd = self.cleaned_data
+        if commit:
+            m.save()
+        if cd['selection']:
+            return m
 
 class BannerForm(forms.ModelForm):
+
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'cols': 90, 'rows': 4})
+    )
+
     class Meta:
         model = Banner
-        exclude = ('user',)
-
-EventSelectedFormSet = inlineformset_factory(
-    Banner,
-    Event,
-    form=EventSelectedForm, extra=1
-)
+        exclude = ('user', 'design',)
