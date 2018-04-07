@@ -10,7 +10,7 @@
     {{ form }}
     {{ formset.management_form }}
 
-    {% for event_form in formset %}
+    {% for event_form in formset.forms %}
 
         {{ event_form.id }}
         <div class="row">

@@ -5,16 +5,14 @@ from .views import (
     BannerView,
     BannerDesignView,
     BannerDetailView,
-    EventsView,
+    BannerNewEventsSelectedCreateView,
 )
-from django.conf import settings
-from django.conf.urls.static import static
 
 
 urlpatterns = [
 
     url(r'^new/$',
-        EventsView.as_view(template_name='events.html'),
+        BannerNewEventsSelectedCreateView.as_view(template_name='events.html'),
         name='banner_new',
         ),
     url(r'^(?P<pk>[0-9]+)/banner_detail/$',
@@ -26,6 +24,3 @@ urlpatterns = [
         name='banner_design',
         ),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
