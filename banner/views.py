@@ -61,6 +61,7 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
                 'end': event['end']['local'].replace('T', ' '),
                 'organizer': event['organizer_id'],
                 'evb_id': event['id'],
+                'evb_url': event['url'],
                 'logo': logo,
             }
             data_event.append(data)

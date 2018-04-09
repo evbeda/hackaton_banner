@@ -16,21 +16,28 @@ SECRET_KEY = '+sm9a(b9bubb(_xdh_dwe6+1k!d_5k8m=r*ox*@7p91#jt(qez'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '0.0.0.0', 'localhost', '.herokuapp.com', 'testserver']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    '0.0.0.0',
+    'localhost',
+    '.herokuapp.com',
+    'testserver'
+]
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sites',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
     'social_django',
     'qrcode',
     'banner',
+    'mysite',
 ]
 
 SITE_ID = 1

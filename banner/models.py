@@ -52,6 +52,7 @@ class Banner(models.Model):
 
 class Event(models.Model):
     evb_id = models.BigIntegerField(default=0)
+    evb_url = models.CharField(max_length=1000, null=True)
     title = models.CharField(max_length=1000)
     description = models.TextField(null=True)
     start = models.DateTimeField()
@@ -65,6 +66,3 @@ class Event(models.Model):
     design = models.ForeignKey(EventDesign, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
-
-    def get_absolute_url(self):
-        return 'https://www.eventbrite.com/e/%i' % self.evb_id
