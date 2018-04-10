@@ -16,7 +16,16 @@ from .models import (
     Event,
     EventDesign,
 )
-from .views import BannerView
+
+from .views import (
+    BannerView,
+    BannerNewEventsSelectedCreateView,
+)
+
+from mock import (
+    MagicMock,
+    patch,
+)
 
 
 class TestBase(TestCase):
@@ -127,11 +136,65 @@ class BannerDetailViewTest(TestBase):
         self.assertEqual(response.status_code, 200)
 
 
-# class SelectionEventsViewTest(TestBase):
+# class SelectionBannerNewEventsSelectedCreateViewTest(TestBase):
 
 #     def comprobation_event_selected(self):
 #             self.post()
 #             if not formset.cleaned_data[i]['selection']:
+class EventTest(TestBase):
+
+    def test_event_creation(self):
+        w = EventFactory()
+        self.assertTrue(isinstance(w, Event))
+        event_list = Event.objects.all()
+        event = event_list[len(event_list) - 1]
+        self.assertEqual(event.title, w.title)
+
+
+class EventViewTest(TestBase):
+
+    def setUp(self):
+        super(EventViewTest, self).setUp()
+        from social_django.models import UserSocialAuth
+        UserSocialAuth.objects.create(
+            user=self.user,
+            provider='eventbrite',
+            extra_data={'access_token': 'user_token'},
+        )
+
+    @patch('banner.views.Eventbrite.get')
+    def test_events_page_status_code(self, mock_eventbrite_get):
+        response = self.client.get('/banner/new/')
+        self.assertEqual(response.status_code, 200)
+
+    @patch('banner.views.Eventbrite.get')
+    def test_call_with_correct_parameters(self, mock_eventbrite_get):
+        self.client.get('/banner/new/')
+        self.assertEquals(
+            mock_eventbrite_get.call_args_list[0][0][0],
+            '/users/me/events/',
+        )
+
+    @skip('implementar pagina de error cuando no hay eventos en Eventbrite')
+    @patch('banner.views.Eventbrite.get')
+    def test_error_none_events(self, mock_eventbrite_get):
+        response = self.client.get('/banner/new/')
+        self.assertContains(response, 'You dont have any event in Eventbrite')
+
+    @skip('Se deberia llamar solo una vez a la API')
+    @patch('banner.views.Eventbrite.get')
+    def test_call_once_api(self, mock_eventbrite_get):
+        self.client.get('/banner/new/')
+        mock_eventbrite_get.assert_called_once()
+
+
+
+
+
+
+
+
+
 
 
 

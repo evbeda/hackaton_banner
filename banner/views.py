@@ -34,18 +34,24 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
     success_url = reverse_lazy('index')
 
     def get_initial(self):
-        access_token = self.request.user.social_auth.all()[0].access_token
-        eventbrite = Eventbrite(access_token)
-        self.events = eventbrite.get('/users/me/events/')['events']
+        # import ipdb; ipdb.set_trace()
+        social_auth = self.request.user.social_auth.filter(provider='eventbrite')
+        if len(social_auth) > 0:
+            access_token = social_auth[0].access_token
+            eventbrite = Eventbrite(access_token)
+            self.events = eventbrite.get('/users/me/events/')['events']
 
     def get_context_data(self, **kwargs):
+
         context = super(
             BannerNewEventsSelectedCreateView,
             self
         ).get_context_data(**kwargs)
-        access_token = self.request.user.social_auth.all()[0].access_token
-        eventbrite = Eventbrite(access_token)
-        self.events = eventbrite.get('/users/me/events/')['events']
+        social_auth = self.request.user.social_auth.filter(provider='eventbrite')
+        if len(social_auth) > 0:
+            access_token = social_auth[0].access_token
+            eventbrite = Eventbrite(access_token)
+            self.events = eventbrite.get('/users/me/events/')['events']
 
         data_event = []
         for event in self.events:
@@ -80,6 +86,7 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
         return context
 
     def post(self, request, *args, **kwargs):
+
         form = forms.BannerForm(
             request.POST,
         )

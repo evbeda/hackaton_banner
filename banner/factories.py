@@ -48,10 +48,21 @@ class BannerFactory(DjangoModelFactory):
     created = LazyFunction(timezone.now)
 
 
+class EventDesignFactory(DjangoModelFactory):
+
+    class Meta:
+        model = models.EventDesign
+        django_get_or_create = ('user',)
+
+    user = SubFactory(UserFactory)
+    name = Sequence(lambda n: "Banner%03d" % n)
+    created = LazyFunction(timezone.now)
+
+
 class EventFactory(DjangoModelFactory):
+
     class Meta:
         model = models.Event
-        django_get_or_create = ('user',)
 
     title = Sequence(lambda n: "Event%03d" % n)
     description = Faker('text')
@@ -61,3 +72,5 @@ class EventFactory(DjangoModelFactory):
     custom_logo = 'none'
     custom_description = 'none'
     created = LazyFunction(timezone.now)
+    # design = SubFactory(EventDesignFactory)
+    banner = SubFactory(BannerFactory)
