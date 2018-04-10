@@ -102,7 +102,10 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             queryset=Event.objects.none(),
         )
         if form.is_valid() and formset.is_valid():
-            if not formset.cleaned_data:
+            if not any([
+                    selection_cleaned_data['selection']
+                    for selection_cleaned_data in formset.cleaned_data
+            ]):
                 form.add_error(NON_FIELD_ERRORS, 'No event selected')
                 return render(
                     request,
