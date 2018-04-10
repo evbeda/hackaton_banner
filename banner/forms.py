@@ -14,6 +14,10 @@ class EventForm(forms.ModelForm):
         required=False,
         widget=forms.HiddenInput(),
     )
+    evb_url = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
     custom_title = forms.CharField(required=False)
     custom_description = forms.CharField(required=False)
     custom_logo = forms.FileField(required=False)

@@ -43,10 +43,10 @@
                        {% else %}
                          <div class="event-description"> {{ event_data.event.description }}</div>
                        {% endif %}
-                     </div> 
+                     </div>
                      <div class="col-md-6">
                        <div class="event-qr">
-                         {% qr_from_object event_data.event "m" %}
+                         {% qr_from_text event_data.event.evb_url "m" %}
                        </div>
                      </div>
                   </div>
