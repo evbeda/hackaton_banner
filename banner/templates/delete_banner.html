@@ -1,0 +1,10 @@
+{% extends './shared/base.html' %}
+
+{% block content %}
+
+<form action="" method="post">{% csrf_token %}
+    <p><h1> Are you sure you want to delete the banner"{{ banner.title }}"?</h1></p>
+    <input type="submit" value="Confirm" class="btn btn-success" />
+</form>
+
+{% endblock %}

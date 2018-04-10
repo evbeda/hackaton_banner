@@ -9,6 +9,7 @@
           <div class="col-md-8">
             <div class="media" style="padding-top: 40px;">
               <div class="media-body" style="padding-left:5px;">
+
                 <a href="{% url 'banner_detail' pk=banner.pk %}">
                   <h4 class="media-heading">{{ banner.title }}</h4>
                 </a>
@@ -19,6 +20,8 @@
           <div class="col-md-4">
             <div class="media" style="padding-top: 90px;">
               <div class="media-body" style="padding-left:7px;">
+                <button type="button" class="btn btn-primary">Edit</button>
+                <a href="{% url 'banner_delete' pk=banner.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
               </div>
             </div>
           </div>
@@ -29,7 +32,7 @@
             <h1>No banners yet!</h1>
         </div>
     {% endif %}
-    
+
     <a href="{% url 'banner_new' %}">
       <div class="glyphicon-ring glyphicon-white plus-banner-button">
         <span class="glyphicon glyphicon-plus glyphicon-bordered"></span>
