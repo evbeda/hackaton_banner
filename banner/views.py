@@ -12,6 +12,7 @@ from django.views.generic.detail import DetailView
 from django.shortcuts import render
 from django.views.generic.edit import (
     CreateView,
+    DeleteView
 )
 from eventbrite import Eventbrite
 from . import forms
@@ -30,16 +31,7 @@ DEFAULT_BANNER_DESIGN = 1
 class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
 
     form_class = forms.BannerForm
-    template_name = "events/events.html"
     success_url = reverse_lazy('index')
-
-    def get_initial(self):
-        # import ipdb; ipdb.set_trace()
-        social_auth = self.request.user.social_auth.filter(provider='eventbrite')
-        if len(social_auth) > 0:
-            access_token = social_auth[0].access_token
-            eventbrite = Eventbrite(access_token)
-            self.events = eventbrite.get('/users/me/events/')['events']
 
     def get_context_data(self, **kwargs):
 
@@ -47,7 +39,9 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             BannerNewEventsSelectedCreateView,
             self
         ).get_context_data(**kwargs)
-        social_auth = self.request.user.social_auth.filter(provider='eventbrite')
+        social_auth = self.request.user.social_auth.filter(
+            provider='eventbrite'
+        )
         if len(social_auth) > 0:
             access_token = social_auth[0].access_token
             eventbrite = Eventbrite(access_token)
@@ -154,9 +148,10 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
         ).form_valid(form)
 
 
-class BannerCreateView(CreateView):
+class BannerDeleteView(DeleteView):
     model = Banner
-    fields = ['first_name', 'last_name']
+    template_name = 'delete_banner.html'
+    success_url = reverse_lazy('index')
 
 
 @method_decorator(login_required, name='dispatch')

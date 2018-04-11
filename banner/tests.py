@@ -181,7 +181,6 @@ class EventViewTest(TestBase):
         response = self.client.get('/banner/new/')
         self.assertContains(response, 'You dont have any event in Eventbrite')
 
-    @skip('Se deberia llamar solo una vez a la API')
     @patch('banner.views.Eventbrite.get')
     def test_call_once_api(self, mock_eventbrite_get):
         self.client.get('/banner/new/')
