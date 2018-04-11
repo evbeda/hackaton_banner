@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% extends './shared/base.html' %}
+{% load bootstrap3 %}
 {% block content %}
   <h1>New banner</h1>
 
@@ -19,48 +20,52 @@
           </div>
         {% endif %}
         {% for field in form %}
-        <h4>{{field.label_tag}}</h4>
-        <div>
-            {{ field.errors }}
-            {{ field }}
-        </div>
-        </tr>
+            <div class="col-md-12">
+                {% bootstrap_field field %}
+            </div>
         {% endfor %}
+        </tr>
     </div>
     {{ formset.management_form }}
+    {{ formset.media }}
     <hr>
         <h3>Select your events for create a new banner</h3>
     {% for event_form in formset %}
-
-        <div class="row col-md-12" style="padding-top: 20px;">
+        <div class="row col-md-12" style="padding-top: 20px;
+            margin-bottom:50px;">
+            <div class="col-md-5">
+                <div class="card" style="width: 18rem; margin-bottom:20px;">
+                  <img class="card-img-top" src="{{ event_form.logo.value }}" alt="Card image cap">
+                  <div class="card-body">
+                      <h5 class="card-title">{{ event_form.title.value }}</h5>
+                      <p class="card-text">{{ event_form.description.value }}</p>
+                  </div>
+                </div>
+                <div class="custom-file">
+                    {{ event_form.logo }}
+                    <label class="control-label">Custom logo</label>
+                    {{ event_form.custom_logo }}
+                </div>
+            </div>
+            <!-- <h5>Start datetime</h5> -->
+            <h4>{{ event_form.start }}</h4>
+            <!-- <h5>End datetime</h5> -->
+            <h4>{{ event_form.end }}</h4>
             <div class="col-md-6">
-                <img class="img-thumbnail" src={{ event_form.logo.value }}>
-                <h4>{{ event_form.title.value }}</h4>
-                <h5>{{ event_form.description.value }}</h5>
-                <!-- <h5>Start datetime</h5> -->
-                <h4>{{ event_form.start }}</h4>
-                <!-- <h5>End datetime</h5> -->
-                <h4>{{ event_form.end }}</h4>
-
+                <div class="form-group">
+                    <label class="control-label">Custom title</label>
+                        {{ event_form.title }}
+                        {{ event_form.custom_title }}
+                        <div class="form-group">
+                            <label class="control-label">Custom description</label>
+                        {{ event_form.description }}
+                        {{ event_form.custom_description }}
+                    </div>
+                </div>
             </div>
-            <div class="col-md-4">
-                <h5>Custom logo</h5>
-                {{ event_form.logo }}
-                {{ event_form.custom_logo }}
-                <h5>Edit Title</h5>
-                {{ event_form.title }}
-                {{ event_form.custom_title }}
-                <h5>Edit Description</h5>
-                {{ event_form.description }}
-                {{ event_form.custom_description }}
-
-            </div>
-            <div class="col-md-2">
+            <div class="col-md-1" style="margin-top:120px;">
                 {{ event_form.selection }}
 
-            </div>
-            <div class="row col-md-12">
-                <hr>
             </div>
         </div>
 

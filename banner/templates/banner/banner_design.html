@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 {% load qr_tags %}
+{% load banner_extras %}
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -12,45 +13,62 @@
   </head>
   <body>
     <div id="impress">
-        <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1">
-            <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
-        </div>
+        <!-- <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1"> -->
+        <!--     <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" /> -->
+        <!-- </div> -->
         {% for event_data in events_data %}
         <div class="step slide" data-x="{{ event_data.data_x }}"
                                 data-y="{{ event_data.data_y }}"
                                 data-rotate="{{ event_data.data_rotate }}"
                                 data-scale="{{ event_data.data_scale }}"
                                 id="event-{{ event_data.event.id }}">
-                <div class="event-logo">
-                  {% if event_data.event.custom_logo %}
-                    <img src="{{ event_data.event.custom_logo }}" />
-                  {% else %}
-                    <img src="{{ event_data.event.logo }}" />
-                  {% endif %}
+            <div class="panel-event">
+                <div class="panel-event-header row">
+                    <div class="col-md-8 event-logo" style="padding: 0
+                    !important;">
+                      {% if event_data.event.custom_logo %}
+                        <img class="img-rounded" src="{{ event_data.event.custom_logo }}" />
+                      {% else %}
+                        <img class="img-rounded" src="{{ event_data.event.logo }}" />
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 info-panel" style="padding-left: 0
+                    !important;">
+                      <div class="event-start-date-month">
+                        {{ event_data.event.start.month|month_name }}
+                      </div>
+                      <div class="event-start-date-day">
+                        {{ event_data.event.start.day }}
+                      </div>
+                      {% if event_data.event.custom_title %}
+                        <div class="event-title">
+                            {{event_data.event.custom_title|safe }}
+                        </div>
+                      {% else %}
+                        <div class="event-title"> {{ event_data.event.title }} </div>
+                      {% endif %}
+                    </div>
                 </div>
-                  {% if event_data.event.custom_title %}
-                    <div class="event-title"> {{ event_data.event.custom_title }} </div>
-                  {% else %}
-                    <div class="event-title"> {{ event_data.event.title }} </div>
-                  {% endif %}
-                  <div class="event-start-date">
-                    {{ event_data.event.start }}
-                  </div>
-                  <div class="row">
-                     <div class="col-md-6">
+                <div class="panel-event-body">
+                  <div class="row box">
+                     <div class="col-md-8" style="padding: 0 !important;">
                        {% if event_data.event.custom_description %}
-                         <div class="event-description"> {{ event_data.event.custom_description }}</div>
+                         <div class="event-description">
+                             {{event_data.event.custom_description|safe }}
+                         </div>
                        {% else %}
                          <div class="event-description"> {{ event_data.event.description }}</div>
                        {% endif %}
                      </div>
-                     <div class="col-md-6">
+                     <div class="col-md-4" style="padding: 0 !important;">
                        <div class="event-qr">
                          {% qr_from_text event_data.event.evb_url "m" %}
                        </div>
                      </div>
                   </div>
+                </div>
             </div>
+        </div>
         {% endfor %}
     </div>
     <script src="{% static 'js/impress.js' %}"></script>
