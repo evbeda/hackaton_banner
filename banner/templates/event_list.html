@@ -2,7 +2,13 @@
 {% extends './shared/base.html' %}
 {% block content %}
   <h1>New banner</h1>
-  <form action="" method="post" enctype="multipart/form-data">
+
+{% if messages %}
+      <h3>{{ messages }}</h3>
+      <a href="http://127.0.0.1:8000/">Back</a>
+      </div>
+{% else %}
+<form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
         {% if form.non_field_errors %}
@@ -23,9 +29,9 @@
     </div>
     {{ formset.management_form }}
     <hr>
-      <h3>Select your events for create a new banner</h3>
+        <h3>Select your events for create a new banner</h3>
     {% for event_form in formset %}
-        
+
         <div class="row col-md-12" style="padding-top: 20px;">
             <div class="col-md-6">
                 <img class="img-thumbnail" src={{ event_form.logo.value }}>
@@ -35,7 +41,7 @@
                 <h4>{{ event_form.start }}</h4>
                 <!-- <h5>End datetime</h5> -->
                 <h4>{{ event_form.end }}</h4>
-                
+
             </div>
             <div class="col-md-4">
                 <h5>Custom logo</h5>
@@ -47,26 +53,29 @@
                 <h5>Edit Description</h5>
                 {{ event_form.description }}
                 {{ event_form.custom_description }}
-                
+
             </div>
             <div class="col-md-2">
                 {{ event_form.selection }}
+
             </div>
             <div class="row col-md-12">
                 <hr>
             </div>
         </div>
-            
+
         {{ event_form.organizer }}
         {{ event_form.evb_id }}
         {{ event_form.evb_url }}
-    {% endfor %}
 
+{% endfor %}
       <div class="row col-md-12" style="padding-top: 40px;">
         <p><input type="submit" name="Events Selected" class="btn btn-primary
         pull-right"></p>
       </div>
   </form>
 
+
+{% endif %}
 
 {% endblock %}
