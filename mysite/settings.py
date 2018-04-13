@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'social_django',
     'qrcode',
     'banner',
-    'mysite',
+    'ckeditor',
+    'bootstrap3',
 ]
 
 SITE_ID = 1
@@ -96,6 +97,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -137,9 +139,27 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SOCIAL_AUTH_EVENTBRITE_KEY = get_env_variable('SOCIAL_AUTH_EVENTBRITE_KEY')
-SOCIAL_AUTH_EVENTBRITE_SECRET = get_env_variable('SOCIAL_AUTH_EVENTBRITE_SECRET')
+SOCIAL_AUTH_EVENTBRITE_SECRET = get_env_variable(
+    'SOCIAL_AUTH_EVENTBRITE_SECRET',
+)
 
-
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'BannerDesign',
+        'toolbar_BannerDesign': [
+            {
+                'name': 'textformat',
+                'items': ['Styles', 'Format', 'Font', 'FontSize'],
+            },
+            {
+                'name': 'colorformat',
+                'items': ['TextColor', 'BGColor'],
+            }
+        ],
+        'height': 25,
+        'width': 500,
+    }
+}
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 

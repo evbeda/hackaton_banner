@@ -1,5 +1,5 @@
 @font-face {
-   font-family: BentonSansRegular;
+   font-family: 'BentonSansRegular';
    src: url(fonts/BentonSans-Regular_sOT.otf);
 }
 body {
@@ -14,21 +14,40 @@ body {
 .event-logo{
   /* width: 100%; */
 }
-.event-logo img{
-  display: block;
+.panel-event {
+  width: 1080px;
+  height: 54vh;
   margin-left: auto;
   margin-right: auto;
-  width: 60vw;
-  height: 40vh;
-  padding-top: 20px;
   position: relative;
+  margin-bottom:10px;
+  padding-top: 5px;
+}
+.panel-event-header {
+  height: 360px;
+  background: #f0f0f0;
+}
+.panel-event-body {
+  width: 1080px;
+  background: #ffffff;
+  height: 100%;
+}
+.event-logo img{
+  width: 720px;
+  height: 360px;
+}
+.info-panel {
+  width: 360px;
+  height: 360px;
+  padding: 10px;
 }
 .box-lateral{
     border-right: 1px solid #CCD0DB;
     border-left: 1px solid #CCD0DB;
 }
 .box{
-    border: 1px solid #CCD0DB;
+  border: 1px solid #f0f0f0;
+  height: 100%;
 }
 .step {
   -webkit-box-sizing: border-box;
@@ -39,8 +58,8 @@ body {
   line-height: 1.5;
 }
 .slide {
-  height: 99vh;
-  width: 99vw;
+  height: 100vh;
+  width: 100vw;
   display: block;
   padding: 0px;
   background-color: white;
@@ -76,15 +95,10 @@ body {
   /* padding-bottom: 30px; */
 }
 .event-qr img{
-  display: block;
+  width: 360px;
   margin-left: auto;
   margin-right: auto;
-  width: 40%;
   position: relative;
-  /* margin: auto; */
-  /* width: 50%; */
-  /* padding-top: 10px; */
-  /* padding-bottom:10px; */
 }
 .event-range-price{
   position: relative;
@@ -126,18 +140,22 @@ body {
   font-weight: normal;
   color: #282C35
 }
-.event-start-date{
-  font-size: 15px;
-  color: #45494E;
-  margin-left: 80px;
+.event-start-date-month {
+  font-size: 20px;
+  color: #424242;
+  margin-left: 20px;
+}
+.event-start-date-day {
+  font-size: 25px;
+  color: #424242;
+  margin-left: 25px;
 }
 .event-description{
   margin-top: 10px;
+  text-align: center;
   font-size: 25px;
   color: #45494E;
   height: 295px;
-  font-family: 'Lucila Console', Monaco, monospace;
-  margin-left: 80px;
 }
 .event-hastags{
   font-size: 24px;

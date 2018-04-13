@@ -2,7 +2,7 @@
 {% load staticfiles %}
 {% block content %}
 <link href="{% static 'css/login.css' %}" rel="stylesheet">
-
+<div class="container">
     {% if form.errors %}
         <p class="text-center">Your username and password didn't match. Please try again.</p>
     {% endif %}
@@ -14,8 +14,7 @@
         {% endif %}
     {% endif %}
 
-     <div class="container">
-         <div class="col-lg-6 col-lg-offset-3">
+         <div class="col-lg-6 offset-lg-3">
 
               <div class="inner-form">
 
@@ -37,6 +36,5 @@
                        </form>
                   </div>
           </div>
-      </div>
-    
 {% endblock %}
+</div>

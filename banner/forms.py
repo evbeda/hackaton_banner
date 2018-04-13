@@ -4,6 +4,7 @@ from django.forms import modelformset_factory
 from .models import (
     Banner,
     Event,
+    EventDesign,
 )
 
 
@@ -19,7 +20,10 @@ class EventForm(forms.ModelForm):
         widget=forms.HiddenInput(),
     )
     custom_title = forms.CharField(required=False)
-    custom_description = forms.CharField(required=False)
+    custom_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'cols': 50, 'rows': 2}),
+    )
     custom_logo = forms.FileField(required=False)
     start = forms.DateTimeField(
         required=False,
@@ -68,3 +72,9 @@ class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
         exclude = ('user', 'design',)
+
+class EventDesignForm(forms.ModelForm):
+
+    class Meta:
+        model = EventDesign
+        exclude = ()

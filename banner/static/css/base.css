@@ -3,15 +3,27 @@
    src: url(../fonts/atrian-1.ttf) format("truetype"),
    local('Atrian-FontZillian');;
 }
-.page-header {
-    background-color: #ffffff;
-    margin-top: 0;
-    padding: 8px 8px 8px 20px;
+.text-black {
+  color: black;
 }
-.page-header h1, .page-header h1 a, .page-header h1 a:visited, .page-header h1 a:active {
-    color: #ff9400;
-    font-size: 30pt;
-    text-decoration: none;
+.text-red {
+  color: red;
+}
+.text-green {
+  color: green;
+}
+.page-header {
+  height: 100px;
+  width: 100vw;
+  margin: 0 !important;
+  padding: 24px;
+}
+.page-body {
+  background: #f6f6f6;
+  min-height: 100vh;
+}
+.box{
+  border: 1px solid #f0f0f0;
 }
 h1, h2, h3, h4, h5{
   font-family: 'Atrian-FontZillian', Monaco, monospace;
@@ -51,8 +63,13 @@ h1 {
 }
 .glyphicon-ring .glyphicon-bordered {
   font-size: 20px;
+  margin-top: 30px;
   vertical-align: middle;
-  display: table-cell;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  transform: scale(1.5);
 }
 
 .glyphicon-white {

@@ -6,6 +6,9 @@ coverage==4.0.3
 decorator==4.2.1
 dj-database-url==0.4.2
 Django==1.11
+django-bootstrap3==9.1.0
+django-ckeditor==5.4.0
+django-js-asset==1.0.0
 django-qrcode==0.3
 enum34==1.1.6
 eventbrite==3.3.3
