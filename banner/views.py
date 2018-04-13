@@ -10,6 +10,9 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.shortcuts import render
+from dateutil.parser import parse as parse_date
+import datetime
+from datetime import datetime
 from django.views.generic.edit import (
     CreateView,
     DeleteView
@@ -31,6 +34,7 @@ DEFAULT_BANNER_DESIGN = 1
 class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
 
     form_class = forms.BannerForm
+    template_name = 'events_list.html'
     success_url = reverse_lazy('index')
 
     def get_context_data(self, **kwargs):
@@ -39,6 +43,7 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             BannerNewEventsSelectedCreateView,
             self
         ).get_context_data(**kwargs)
+
         social_auth = self.request.user.social_auth.filter(
             provider='eventbrite'
         )
@@ -54,29 +59,38 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             else:
                 logo = 'none'
 
-            data = {
-                'title': event['name']['text'],
-                'description': event['description']['text'],
-                'start': event['start']['local'].replace('T', ' '),
-                'end': event['end']['local'].replace('T', ' '),
-                'organizer': event['organizer_id'],
-                'evb_id': event['id'],
-                'evb_url': event['url'],
-                'logo': logo,
-            }
-            data_event.append(data)
+            if parse_date(event['start']['local']) >= datetime.today():
 
-        EventFormSet = modelformset_factory(
-            Event,
-            form=forms.EventForm,
-            extra=len(data_event),
-        )
+                data = {
+                    'title': event['name']['text'],
+                    'description': event['description']['text'],
+                    'start': event['start']['local'].replace('T', ' '),
+                    'end': event['end']['local'].replace('T', ' '),
+                    'organizer': event['organizer_id'],
+                    'evb_id': event['id'],
+                    'evb_url': event['url'],
+                    'logo': logo,
+                }
+                data_event.append(data)
 
-        formset = EventFormSet(
-            initial=data_event,
-            queryset=Event.objects.none(),
-        )
-        context['formset'] = formset
+        messages = []
+        if data_event == []:
+            messages = 'You dont have active events'
+            context['messages'] = messages
+        else:
+
+            EventFormSet = modelformset_factory(
+                Event,
+                form=forms.EventForm,
+                extra=len(data_event),
+            )
+
+            formset = EventFormSet(
+                initial=data_event,
+                queryset=Event.objects.none(),
+            )
+
+            context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
@@ -216,3 +230,5 @@ class BannerDesignView(TemplateView, LoginRequiredMixin):
                 'data_scale': banner.design.data_scale,
                 'event': event[1],
             }
+
+
