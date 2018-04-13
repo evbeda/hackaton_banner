@@ -11,6 +11,7 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.shortcuts import render
+import calendar
 from dateutil.parser import parse as parse_date
 import datetime
 from datetime import datetime
@@ -32,6 +33,7 @@ from django.shortcuts import render, get_object_or_404
 
 
 DEFAULT_BANNER_DESIGN = 1
+DEFAULT_EVENT_DESIGN = 1
 
 
 @method_decorator(login_required, name='dispatch')
@@ -120,8 +122,8 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
 
                 '''create evetns'''
                 if event.evb_id not in events_evb_id_list:
-                    e_design = EventDesign.objects.create(
-                        user=self.request.user,
+                    e_design = EventDesign.objects.get(
+                        id=DEFAULT_EVENT_DESIGN,
                     )
                     event.banner = updating_banner
                     event.design = e_design
@@ -206,8 +208,8 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                 banner.design = b_design
                 banner.save()
 
-                e_design = EventDesign.objects.create(
-                    user=self.request.user,
+                e_design = EventDesign.objects.get(
+                    id=DEFAULT_EVENT_DESIGN,
                 )
 
                 for event in events:
@@ -252,7 +254,7 @@ class BannerView(TemplateView, LoginRequiredMixin):
 class BannerDetailView(DetailView, LoginRequiredMixin):
 
     model = Banner
- 
+
     def get_context_data(self, **kwargs):
         context = super(BannerDetailView, self).get_context_data(**kwargs)
         banner = Banner.objects.get(id=self.kwargs['pk'])
@@ -287,6 +289,7 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
                 )
             )
         ]
+
         events_data = [
             event for event in self.get_events_data(events, banner)
         ]
@@ -296,15 +299,59 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
 
     def get_events_data(self, events, banner):
         for event in events:
+            idx, event = event
+            event = self.replace_data(event)
             yield {
-                'data_x': (event[0] + 1) * banner.design.data_x,
-                'data_y': (event[0] + 1) * banner.design.data_y,
-                'data_z': (event[0] + 1) * banner.design.data_z,
+                'data_x': (idx + 1) * banner.design.data_x,
+                'data_y': (idx + 1) * banner.design.data_y,
+                'data_z': (idx + 1) * banner.design.data_z,
                 'data_rotate': banner.design.data_rotate,
                 'data_scale': banner.design.data_scale,
-                'event': event[1],
+                'event': event,
             }
 
+    def replace_data(self, event):
+        if event.custom_title:
+            event.design.html = str(event.design.html).replace(
+                '|| title ||', event.custom_title
+            )
+        else:
+            event.design.html = str(event.design.html).replace(
+                '|| title ||', event.title
+            )
+
+        if event.custom_description:
+            event.design.html = str(event.design.html).replace(
+                '|| description ||', event.custom_description
+            )
+        else:
+            event.design.html = str(event.design.html).replace(
+                '|| description ||', event.description
+            )
+
+        if event.custom_logo:
+            event.design.html = str(event.design.html).replace(
+                '|| logo ||', str(event.custom_logo)
+            )
+        else:
+            event.design.html = str(event.design.html).replace(
+                '|| logo ||', str(event.logo)
+            )
+
+        event.design.html = str(event.design.html).replace(
+            '|| startdate_month ||',
+            calendar.month_name[event.start.month][:3].upper() + '.'
+        )
+
+        event.design.html = str(event.design.html).replace(
+            '|| startdate_day ||', str(event.start.day)
+        )
+
+        event.design.html = str(event.design.html).replace(
+            '|| evb_url ||', str(event.evb_url)
+        )
+
+        return event
 
 @method_decorator(login_required, name='dispatch')
 class EditEventDesignView(FormView, LoginRequiredMixin):
@@ -318,3 +365,34 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
         event = Event.objects.get(pk=self.kwargs['epk'])
         context['event'] = event
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(EditEventDesignView, self).get_form_kwargs()
+        kwargs['initial']['html'] = EventDesign.objects.get(
+            id=DEFAULT_EVENT_DESIGN
+        ).html
+        return kwargs
+
+    def post(self, request, *args, **kwargs):
+        form = forms.EventDesignForm(
+            request.POST,
+        )
+
+        if form.is_valid():
+            return self.form_valid(form)
+
+        return self.form_invalid(form)
+
+    def form_valid(self, form, *args, **kwargs):
+        form.instance.user = self.request.user
+        event_design = form.save()
+
+        event = Event.objects.get(pk=self.kwargs['epk'])
+        event_design.save()
+        event.design = event_design
+        event.save()
+
+        return super(
+            EditEventDesignView,
+            self,
+        ).form_valid(form)

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
+from social_django.models import UserSocialAuth
 from unittest import skip
 from .factories import (
     BannerDesignFactory,
@@ -20,6 +21,7 @@ from .models import (
 from .views import (
     BannerView,
     BannerNewEventsSelectedCreateView,
+    EditEventDesignView,
 )
 
 from mock import (
@@ -104,26 +106,6 @@ class BannerTest(TestBase):
         banner = banner_list[len(banner_list) - 1]
         self.assertEqual(banner.title, w.title)
 
-    @skip('Falta implementar banner_new!')
-    def test_banner_new(self):
-        design = EventDesign(user=UserFactory())
-        design.save()
-        ev1 = Event(
-            start=timezone.now(),
-            end=timezone.now(),
-            design=design
-        )
-        ev2 = Event(
-            start=timezone.now(),
-            end=timezone.now(),
-            design=design
-        )
-        events = [ev1, ev2]
-        bw = BannerView()
-        b = bw.banner_new(events)
-        self.assertTrue(isinstance(b, Banner))
-        self.assertEquals(b, ev1.banner)
-
 
 class BannerDetailViewTest(TestBase):
 
@@ -136,11 +118,6 @@ class BannerDetailViewTest(TestBase):
         self.assertEqual(response.status_code, 200)
 
 
-# class SelectionBannerNewEventsSelectedCreateViewTest(TestBase):
-
-#     def comprobation_event_selected(self):
-#             self.post()
-#             if not formset.cleaned_data[i]['selection']:
 class EventTest(TestBase):
 
     def test_event_creation(self):
@@ -155,7 +132,6 @@ class EventViewTest(TestBase):
 
     def setUp(self):
         super(EventViewTest, self).setUp()
-        from social_django.models import UserSocialAuth
         UserSocialAuth.objects.create(
             user=self.user,
             provider='eventbrite',
@@ -187,28 +163,12 @@ class EventViewTest(TestBase):
         mock_eventbrite_get.assert_called_once()
 
 
+class BannerDetailViewTest(TestBase):
 
+    def setUp(self):
+        super(BannerDetailViewTest, self).setUp()
+        self.banner = BannerFactory()
 
-
-
-
-
-
-
-
-
-
-# class TestSignup(unittest.TestCase):
-
-#     def setUp(self):
-#         self.driver = webdriver.Firefox()
-
-#     def test_signup_fire(self):
-#         self.driver.get("http://localhost:8000/add/")
-#         self.driver.find_element_by_id('id_title').send_keys("test title")
-#         self.driver.find_element_by_id('id_body').send_keys("test body")
-#         self.driver.find_element_by_id('submit').click()
-#         self.assertIn("http://localhost:8000/", self.driver.current_url)
-
-#     def tearDown(self):
-#         self.driver.quit
+    def test_banner_detail_view(self):
+        response = self.client.get(self.banner.get_absolute_url)
+        self.assertEqual(response.status_code, 200)

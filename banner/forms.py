@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
 from django.forms import modelformset_factory
+from ckeditor.widgets import CKEditorWidget
 from .models import (
     Banner,
     Event,
@@ -75,6 +76,11 @@ class BannerForm(forms.ModelForm):
 
 class EventDesignForm(forms.ModelForm):
 
+    html = forms.CharField(
+        required=False,
+        widget=CKEditorWidget(),
+    )
+
     class Meta:
         model = EventDesign
-        exclude = ()
+        exclude = ('user', 'name',)

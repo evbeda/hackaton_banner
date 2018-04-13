@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'css/banner-design.css' %}">
+    <script type="text/javascript" src="http://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"> </script>
   </head>
   <body>
     <div id="impress">
@@ -22,53 +23,16 @@
                                 data-rotate="{{ event_data.data_rotate }}"
                                 data-scale="{{ event_data.data_scale }}"
                                 id="event-{{ event_data.event.id }}">
-            <div class="panel-event">
-                <div class="panel-event-header row">
-                    <div class="col-md-8 event-logo" style="padding: 0
-                    !important;">
-                      {% if event_data.event.custom_logo %}
-                        <img class="img-rounded" src="{{ event_data.event.custom_logo }}" />
-                      {% else %}
-                        <img class="img-rounded" src="{{ event_data.event.logo }}" />
-                      {% endif %}
-                    </div>
-                    <div class="col-md-4 info-panel" style="padding-left: 0
-                    !important;">
-                      <div class="event-start-date-month">
-                        {{ event_data.event.start.month|month_name }}
-                      </div>
-                      <div class="event-start-date-day">
-                        {{ event_data.event.start.day }}
-                      </div>
-                      {% if event_data.event.custom_title %}
-                        <div class="event-title">
-                            {{event_data.event.custom_title|safe }}
-                        </div>
-                      {% else %}
-                        <div class="event-title"> {{ event_data.event.title }} </div>
-                      {% endif %}
-                    </div>
-                </div>
-                <div class="panel-event-body">
-                  <div class="row box">
-                     <div class="col-md-8" style="padding: 0 !important;">
-                       {% if event_data.event.custom_description %}
-                         <div class="event-description">
-                             {{event_data.event.custom_description|safe }}
-                         </div>
-                       {% else %}
-                         <div class="event-description"> {{ event_data.event.description }}</div>
-                       {% endif %}
-                     </div>
-                     <div class="col-md-4" style="padding: 0 !important;">
-                       <div class="event-qr">
-                         {% qr_from_text event_data.event.evb_url "m" %}
-                       </div>
-                     </div>
-                  </div>
-                </div>
+            <div class="event-container">
+                {{ event_data.event.design.html|safe }} 
             </div>
         </div>
+        <script type="text/javascript">
+            new QRCode(
+                document.getElementById("qrcode"),
+                "{{ event_data.event.evb_url }}"
+            );
+        </script>
         {% endfor %}
     </div>
     <script src="{% static 'js/impress.js' %}"></script>
