@@ -20,7 +20,7 @@
           <div class="col-md-4">
             <div class="media" style="padding-top: 90px;">
               <div class="media-body" style="padding-left:7px;">
-                <button type="button" class="btn btn-primary">Edit</button>
+                <a href="{% url 'banner_update' pk=banner.pk %}"><button type="button" class="btn btn-primary">Edit</button></a>
                 <a href="{% url 'banner_delete' pk=banner.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
               </div>
             </div>
