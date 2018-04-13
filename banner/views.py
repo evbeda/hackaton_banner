@@ -15,7 +15,8 @@ import datetime
 from datetime import datetime
 from django.views.generic.edit import (
     CreateView,
-    DeleteView
+    UpdateView,
+    DeleteView,
 )
 from eventbrite import Eventbrite
 from . import forms
@@ -25,13 +26,15 @@ from .models import (
     Event,
     EventDesign,
 )
+from django.views.generic.edit import FormView
+from django.shortcuts import render, get_object_or_404
 
 
 DEFAULT_BANNER_DESIGN = 1
 
 
 @method_decorator(login_required, name='dispatch')
-class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
+class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
 
     form_class = forms.BannerForm
     template_name = 'events_list.html'
@@ -93,8 +96,70 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
             context['formset'] = formset
         return context
 
-    def post(self, request, *args, **kwargs):
+    def edit_banner(self, form, formset, pk, *args, **kwargs):
+        form.instance.user = self.request.user
+        updating_banner = Banner.objects.get(id=self.kwargs['pk'])
+        updating_banner.title = form.cleaned_data['title']
+        updating_banner.description = form.cleaned_data['description']
+        updating_banner.save()
+        updating_events = Event.objects.filter(banner_id=self.kwargs['pk'])
+        events_evb_id_list = [event.evb_id for event in updating_events]
+        updated_events = formset.save(commit=False)
+        '''delete events'''
+        ev_id_list = [
+            event.evb_id for event in updated_events
+            if event is not None
+        ]
+        for updating_event in updating_events:
+            if updating_event.evb_id not in ev_id_list:
+                Event.objects.get(id=updating_event.id)
+                updating_event.delete()
+        for event in updated_events:
+            if event is not None:
 
+                '''create evetns'''
+                if event.evb_id not in events_evb_id_list:
+                    e_design = EventDesign.objects.create(
+                        user=self.request.user,
+                    )
+                    event.banner = updating_banner
+                    event.design = e_design
+                    if event.custom_logo:
+                        fs = FileSystemStorage()
+                        filename = fs.save(
+                            event.custom_logo.name,
+                            event.custom_logo
+                        )
+                        event.custom_logo = fs.url(filename)
+                    event.save()
+                else:
+                    for updating_event in updating_events:
+
+                        '''update events'''
+                        if event.evb_id == updating_event.evb_id:
+                            updating_event.custom_title = event.custom_title
+                            updating_event.custom_description \
+                                = event.custom_description
+                            updating_event.start = event.start
+                            updating_event.end = event.end
+                            try:
+                                if event.custom_logo:
+                                    fs = FileSystemStorage()
+                                    filename = fs.save(
+                                        event.custom_logo.name,
+                                        event.custom_logo
+                                    )
+                                    updating_event.custom_logo \
+                                        = fs.url(filename)
+                                updating_event.save()
+                            except IntegrityError as e:
+                                print e.message
+        return super(
+            BannerNewEventsSelectedCreateView,
+            self,
+        ).form_valid(form)
+
+    def post(self, request, *args, **kwargs):
         form = forms.BannerForm(
             request.POST,
         )
@@ -117,10 +182,13 @@ class BannerNewEventsSelectedCreateView(CreateView, LoginRequiredMixin):
                 form.add_error(NON_FIELD_ERRORS, 'No event selected')
                 return render(
                     request,
-                    'events.html',
+                    'event_list.html',
                     {'form': form, 'formset': formset}
                 )
-            return self.form_valid(form, formset)
+            if 'pk' in self.kwargs:
+                return self.edit_banner(form, formset, self.kwargs['pk'])
+            else:
+                return self.form_valid(form, formset)
         else:
             return self.form_invalid(form)
 
