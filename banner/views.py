@@ -250,19 +250,108 @@ class BannerView(TemplateView, LoginRequiredMixin):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class BannerDetailView(DetailView, LoginRequiredMixin):
 
+
+
+
+
+
+
+
+
+@method_decorator(login_required, name='dispatch')
+class BannerDetailView(FormView, LoginRequiredMixin):
+    form_class = forms.BannerForm
+    template_name = 'events_detail.html'
+    success_url = reverse_lazy('index')
+    # model = Banner
+
+<<<<<<< HEAD
     model = Banner
 
+=======
+>>>>>>> starting
     def get_context_data(self, **kwargs):
         context = super(BannerDetailView, self).get_context_data(**kwargs)
         banner = Banner.objects.get(id=self.kwargs['pk'])
         events = Event.objects.filter(banner=banner)
 
+        numbers = [x + 1 for x in range(len(events))]
+        import ipdb; ipdb.set_trace()
+
+        data_event = []
+        for event in events:
+            if event.logo is not None:
+                logo = event.logo
+            else:
+                logo = 'none'
+                data = {
+                    'title': event.title,
+                    'description': event.description,
+                    'start': event.start,
+                    'end': event.end,
+                    'organizer': event.organizer_id,
+                    'evb_id': event.evb_id,
+                    'evb_url': event.evb_url,
+                    'logo': logo,
+                    'order': order,
+                }
+                data_event.append(data)
+
+
+            EventFormSet = modelformset_factory(
+                Event,
+                form=forms.EventForm,
+                extra=len(data_event),
+            )
+
+            formset = EventFormSet(
+                initial=data_event,
+                queryset=Event.objects.none(),
+            )
+        context['numbers'] = numbers
         context['banner'] = banner
         context['events'] = events
+        context['formset'] = formset
         return context
+
+
+    def post(self, request, *args, **kwargs):
+
+        EventFormSet = modelformset_factory(
+            Event,
+            form=forms.EventForm,
+        )
+
+        formset = EventFormSet(
+            request.POST,
+            request.FILES,
+            queryset=Event.objects.none(),
+        )
+        if formset.is_valid():
+
+            return self.form_valid(formset)
+        else:
+            return self.form_invalid(formset)
+
+    def form_valid(self, form, formset):
+        # form.instance.user = self.request.user
+        events = formset.save(commit=False)
+
+
+        return super(
+            BannerDetailView,
+            self,
+        ).form_valid(form)
+
+
+
+
+
+
+
+
+
 
 
 @method_decorator(login_required, name='dispatch')
