@@ -1,0 +1,157 @@
+
+@font-face {
+   font-family: 'BentonSansRegular';
+   src: url(fonts/BentonSans-Regular_sOT.otf);
+}
+#qrcode img{
+    width: 50%;
+}
+.eventbrite-logo{
+	width: 100%;
+}
+.event-logo{
+  /* width: 100%; */
+}
+.panel-event {
+  width: 1080px;
+  height: 54vh;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  margin-bottom:10px;
+  padding-top: 5px;
+}
+.create-banner-header {
+  height: 100px;
+  width: 100vw;
+  margin: 0 !important;
+  padding: 24px;
+}
+.create-banner-body {
+  background: #f6f6f6;
+}
+.event-logo img{
+  width: 720px;
+  height: 360px;
+}
+.info-panel {
+  width: 360px;
+  height: 360px;
+  padding: 10px;
+}
+.box-lateral{
+    border-right: 1px solid #CCD0DB;
+    border-left: 1px solid #CCD0DB;
+}
+.step {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing:    border-box;
+  -ms-box-sizing:     border-box;
+  -o-box-sizing:      border-box;
+  box-sizing:         border-box;
+  line-height: 1.5;
+}
+.slide {
+  height: 100vh;
+  width: 100vw;
+  display: block;
+  padding: 0px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, .3);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .2);
+}
+.btn-submit {
+  vertical-align: middle;
+  background: white;
+  color: #f66a26;
+  border: 1px solid #f6f6f6;
+}
+.section-title {
+  padding: 18px;
+}
+.section-number {
+  width: 50px;
+  height: 50px;
+  background-color: #1893D6; 
+  color: #ffffff;
+  margin-top: 5px;
+  margin-left: 15px;
+  padding-top: 5px;
+  text-align: center;
+  font: 32px Arial, sans-serif;
+}
+.event-qr{
+  /* padding: 20px; */
+  /* padding-bottom: 30px; */
+}
+.event-qr img{
+  width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+.event-range-price{
+  position: relative;
+  top: -227px;
+  text-transform: uppercase;
+}
+.event-range-price span{
+  float: right;
+  background-color: hsla(0,0%,100%,.92);
+  font-size: 16px;
+  line-height: 18px;
+  color: #282c35;
+  padding: 5px 10px;
+  box-sizing: border-box;
+}
+.event-detail{
+  font-size: 18px;
+  margin-top: 20px
+}
+.eventbrite-banner{
+  border: 0px;
+}
+.eventbrite-banner img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.div-logo{
+  padding: 0px !important;
+}
+.event-name{
+  font-size: 3em;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  font-weight: normal;
+  color: #282C35
+}
+.event-start-date-month {
+  font-size: 20px;
+  color: #424242;
+  margin-left: 20px;
+}
+.event-start-date-day {
+  font-size: 25px;
+  color: #424242;
+  margin-left: 25px;
+}
+.event-description{
+  margin-top: 10px;
+  text-align: center;
+  font-size: 25px;
+  color: #45494E;
+  height: 295px;
+}
+.event-hastags{
+  font-size: 24px;
+  color: #5B5F68;
+}
+.event-location-line-two{
+  color: #666A73;
+}

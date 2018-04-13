@@ -97,6 +97,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases

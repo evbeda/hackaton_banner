@@ -9,6 +9,7 @@ from django.forms import modelformset_factory
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.edit import FormView
 from django.shortcuts import render
 from dateutil.parser import parse as parse_date
 import datetime
@@ -251,19 +252,24 @@ class BannerView(TemplateView, LoginRequiredMixin):
 class BannerDetailView(DetailView, LoginRequiredMixin):
 
     model = Banner
-
-    def get_object(self, queryset=None):
+ 
+    def get_context_data(self, **kwargs):
+        context = super(BannerDetailView, self).get_context_data(**kwargs)
         banner = Banner.objects.get(id=self.kwargs['pk'])
-        return banner
+        events = Event.objects.filter(banner=banner)
+
+        context['banner'] = banner
+        context['events'] = events
+        return context
 
 
 @method_decorator(login_required, name='dispatch')
-class BannerDesignView(TemplateView, LoginRequiredMixin):
+class BannerPreview(TemplateView, LoginRequiredMixin):
 
-    template_name = 'banner/banner_design.html'
+    template_name = 'banner/preview.html'
 
     def get_context_data(self, **kwargs):
-        context = super(BannerDesignView, self).get_context_data(**kwargs)
+        context = super(BannerPreview, self).get_context_data(**kwargs)
         banner = Banner.objects.select_related(
             'design'
         ) .get(
@@ -300,3 +306,15 @@ class BannerDesignView(TemplateView, LoginRequiredMixin):
             }
 
 
+@method_decorator(login_required, name='dispatch')
+class EditEventDesignView(FormView, LoginRequiredMixin):
+
+    template_name = 'event/edit_design.html'
+    form_class = forms.EventDesignForm
+    success_url = reverse_lazy('index')
+
+    def get_context_data(self, **kwargs):
+        context = super(EditEventDesignView, self).get_context_data(**kwargs)
+        event = Event.objects.get(pk=self.kwargs['epk'])
+        context['event'] = event
+        return context

@@ -1,12 +1,28 @@
 <!DOCTYPE html>
 {% extends '../shared/base.html' %}
-
 {% block content %}
-<h1>{{ banner.title }}</h1>
-<p> {{ banner.description }}
-<br>
-<a class="btn btn-primary pull-right" href="{% url 'banner_design' pk=banner.pk %}" target="blank">
-    Preview
-</a>
+<div class="page-header box">
+  <h2>{{ banner.title }}</h2>
+</div>
+<div class="page-body">
+  <div class="container">
+    <p> {{ banner.description }}
+    <br>
+    <div class="row col-md-12">
+    {% for event in events %}
+      <div class="col-md-6">
+        <div class="card" style="width: 18rem; margin-bottom:20px;">
+          <img class="card-img-top" src="{{ event.logo }}" alt="Card image cap">
+          <div class="card-body">
+              <h5 class="card-title" style="text-decoration: bold;">{{ event.title }}</h5>
+              <p class="card-text" style="text-size: 10px;">{{ event.description }}</p>
+              <a href="{% url 'edit_design' pk=banner.pk epk=event.pk %}" class="btn btn-primary">Edit view</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}
 

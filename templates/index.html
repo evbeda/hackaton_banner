@@ -2,40 +2,48 @@
 {% extends './shared/base.html' %}
 
 {% block content %}
-  <h1>Your banners</h1>
+<div class="page-header box">
+  <h2>Your banners</h2>
+</div>
+<div class="page-body">
+  <div class="container" style="padding-top: 20px;">
     {% if banners %}
       {% for banner in banners %}
-      <div class="row">
-          <div class="col-md-8">
-            <div class="media" style="padding-top: 40px;">
-              <div class="media-body" style="padding-left:5px;">
-
-                <a href="{% url 'banner_detail' pk=banner.pk %}">
-                  <h4 class="media-heading">{{ banner.title }}</h4>
+        <div class="" style="padding-top: 60px;">
+            <div class="row col-md-12">
+              <a class="text-black" href="{% url 'banner_detail' pk=banner.pk %}" target="blank">
+                <h4>{{ banner.title }}</h4>
+              </a>
+              <div class="float-right" style="margin-left: 20px;">
+                <a class="" href="{% url 'preview' pk=banner.pk %}">
+                  <span class="fas fa-eye"></span>
                 </a>
-                    <p>{{ banner.description }}</p>
+                <a class="text-green" href="{% url 'banner_update' pk=banner.pk %}">
+                  <span class="fas fa-edit"></span>
+                </a>
+                <a class="text-red" href="{% url 'banner_delete' pk=banner.pk %}">
+                  <span class="fas fa-eraser"></span>
+                </a>
               </div>
+            <div class="col-md-12">
+              <p>{{ banner.description }}</p>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="media" style="padding-top: 90px;">
-              <div class="media-body" style="padding-left:7px;">
-                <a href="{% url 'banner_update' pk=banner.pk %}"><button type="button" class="btn btn-primary">Edit</button></a>
-                <a href="{% url 'banner_delete' pk=banner.pk %}"><button type="button" class="btn btn-danger">Delete</button></a>
-              </div>
-            </div>
-          </div>
-      </div>
-      {% endfor %}
-    {% else %}
-        <div>
-            <h1>No banners yet!</h1>
         </div>
-    {% endif %}
+        {% endfor %}
+      {% else %}
+          <div>
+              <h1>No banners yet!</h1>
+          </div>
+      {% endif %}
 
-    <a href="{% url 'banner_new' %}">
-      <div class="glyphicon-ring glyphicon-white plus-banner-button">
-        <span class="glyphicon glyphicon-plus glyphicon-bordered"></span>
+          <a href="{% url 'banner_new' %}">
+            <div class="glyphicon-ring glyphicon-white plus-banner-button">
+              <span class="fas fa-plus glyphicon-bordered"></span>
+            </div>
+          </a>
+    
+        </div>
+        
       </div>
-    </a>
+
 {% endblock %}

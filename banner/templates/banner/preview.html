@@ -13,9 +13,9 @@
   </head>
   <body>
     <div id="impress">
-        <!-- <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1"> -->
-        <!--     <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" /> -->
-        <!-- </div> -->
+        <div class="step slide eventbrite-banner" data-x="0" data-y="0" data-rotate="0" data-scale="1">
+            <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
+        </div>
         {% for event_data in events_data %}
         <div class="step slide" data-x="{{ event_data.data_x }}"
                                 data-y="{{ event_data.data_y }}"

@@ -8,6 +8,7 @@ class EventDesign(models.Model):
         on_delete=models.CASCADE,
     )
     name = models.CharField(max_length=200)
+    html = models.TextField(null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
 

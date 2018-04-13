@@ -1,10 +1,10 @@
 from django import forms
 from django.core.validators import FileExtensionValidator
 from django.forms import modelformset_factory
-from ckeditor.widgets import CKEditorWidget
 from .models import (
     Banner,
     Event,
+    EventDesign,
 )
 
 
@@ -19,13 +19,10 @@ class EventForm(forms.ModelForm):
         required=False,
         widget=forms.HiddenInput(),
     )
-    custom_title = forms.CharField(
-        required=False,
-        widget=CKEditorWidget(),
-    )
+    custom_title = forms.CharField(required=False)
     custom_description = forms.CharField(
         required=False,
-        widget=CKEditorWidget(),
+        widget=forms.Textarea(attrs={'cols': 50, 'rows': 2}),
     )
     custom_logo = forms.FileField(required=False)
     start = forms.DateTimeField(
@@ -75,3 +72,9 @@ class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
         exclude = ('user', 'design',)
+
+class EventDesignForm(forms.ModelForm):
+
+    class Meta:
+        model = EventDesign
+        exclude = ()

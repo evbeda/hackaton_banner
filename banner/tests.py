@@ -76,7 +76,7 @@ class BannerDesignViewTest(TestBase):
     def test_banner_design_view(self):
         response = self.client.get('/banner/' +
                                    str(self.banner.id) +
-                                   '/banner_design/')
+                                   '/preview/')
         self.assertEqual(response.status_code, 200)
 
     def test_events_inside_banner(self):
@@ -90,7 +90,7 @@ class BannerDesignViewTest(TestBase):
 
         response = self.client.get('/banner/' +
                                    str(self.banner.id) +
-                                   '/banner_design/')
+                                   '/preview/')
         self.assertContains(response, 'event-' + str(event1.id))
         self.assertContains(response, 'event-' + str(event2.id))
 
