@@ -78,3 +78,51 @@ class EventDesignForm(forms.ModelForm):
     class Meta:
         model = EventDesign
         exclude = ()
+
+'''will be refactor'''
+class EventForm(forms.ModelForm):
+
+    selection = forms.BooleanField(required=False)
+    evb_id = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    evb_url = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    custom_title = forms.CharField(required=False)
+    custom_description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'cols': 50, 'rows': 2}),
+    )
+    custom_logo = forms.FileField(required=False)
+    start = forms.DateTimeField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    end = forms.DateTimeField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    organizer = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    title = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    logo = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(),
+    )
+    order = forms.CharField(
+        required=False,
+    )
+
+
