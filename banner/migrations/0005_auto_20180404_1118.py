@@ -28,6 +28,6 @@ class Migration(migrations.Migration):
             '"data_y","data_z","multiplier_x","multiplier_y","multiplier_z")' +
             'VALUES (\'horizontal layout\',\'2018-04-04 11:57:38' +
             '.344572-03\',\'2018-04-04 11:57:38.344603-03\',' +
-            '1,0,1,-2000,0,0,0,0,0);'
+            '1,0,1,2000,0,0,0,0,0);'
         ),
     ]

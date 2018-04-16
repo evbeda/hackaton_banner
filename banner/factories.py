@@ -72,5 +72,5 @@ class EventFactory(DjangoModelFactory):
     custom_logo = 'none'
     custom_description = 'none'
     created = LazyFunction(timezone.now)
-    # design = SubFactory(EventDesignFactory)
+    design = models.EventDesign.objects.get(id=1)
     banner = SubFactory(BannerFactory)
