@@ -77,7 +77,7 @@ class BannerForm(forms.ModelForm):
 class EventDesignForm(forms.ModelForm):
 
     html = forms.CharField(
-        required=False,
+        required=True,
         widget=CKEditorWidget(),
     )
 

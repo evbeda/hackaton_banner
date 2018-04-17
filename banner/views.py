@@ -381,7 +381,12 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
         if form.is_valid():
             return self.form_valid(form)
 
-        return self.form_invalid(form)
+        form.add_error(NON_FIELD_ERRORS, "Can't submit it empty!")
+        return render(
+            request,
+            'event/edit_design.html',
+            {'form': form}
+        )
 
     def form_valid(self, form, *args, **kwargs):
         form.instance.user = self.request.user
