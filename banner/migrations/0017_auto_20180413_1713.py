@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
             '</div>'
             '</div>'
             '<div class="col-md-4" style="padding: 0 !important;">'
-            '<div class="event-qr" id="qrcode"></div>'
+            '<div class="event-qr" id="qrcode-|| id ||"></div>'
             '</div>'
             '</div>'
             '</div>'

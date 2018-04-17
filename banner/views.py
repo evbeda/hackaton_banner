@@ -351,6 +351,10 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
             '|| evb_url ||', str(event.evb_url)
         )
 
+        event.design.html = str(event.design.html).replace(
+            '|| id ||', str(event.id)
+        )
+
         return event
 
 
