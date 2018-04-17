@@ -286,7 +286,7 @@ class EditEventDesignViewTest(TestBase):
         self.assertEquals(self.event, response.context_data['event'])
         self.assertEquals(200, response.status_code)
 
-    def test_form_initial_data(self):
+    def test_form_initial_data_default(self):
 
         default_event_design = EventDesign.objects.get(id=1)
 
@@ -298,4 +298,21 @@ class EditEventDesignViewTest(TestBase):
         self.assertEquals(
             response.context_data['form'].initial['html'],
             default_event_design.html
+        )
+
+    def test_form_initial_data(self):
+
+        self.event.design = EventDesign.objects.create(
+            user=self.user,
+            html='asd',
+        )
+        self.event.save()
+        response = self.client.get("/banner/{}/event/{}/".format(
+            self.banner.id,
+            self.event.id,
+        ), follow=True)
+
+        self.assertEquals(
+            response.context_data['form'].initial['html'],
+            self.event.design.html
         )
