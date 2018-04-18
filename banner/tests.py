@@ -5,6 +5,10 @@ from django.test import TestCase
 from django.utils import timezone
 from social_django.models import UserSocialAuth
 from unittest import skip
+from mock import (
+    MagicMock,
+    patch,
+)
 from .factories import (
     BannerDesignFactory,
     BannerFactory,
@@ -17,16 +21,13 @@ from .models import (
     Event,
     EventDesign,
 )
-
 from .views import (
     BannerView,
     BannerNewEventsSelectedCreateView,
     EditEventDesignView,
 )
-
-from mock import (
-    MagicMock,
-    patch,
+from .forms import (
+    EventDesignForm,
 )
 
 
@@ -163,12 +164,138 @@ class EventViewTest(TestBase):
         mock_eventbrite_get.assert_called_once()
 
 
-class BannerDetailViewTest(TestBase):
+class EventDesignFormTest(TestBase):
 
     def setUp(self):
-        super(BannerDetailViewTest, self).setUp()
-        self.banner = BannerFactory()
+        super(EventDesignFormTest, self).setUp()
 
-    def test_banner_detail_view(self):
-        response = self.client.get(self.banner.get_absolute_url)
-        self.assertEqual(response.status_code, 200)
+    def test_edit_design_form_valid(self):
+        form_data = {
+            u'Edit': [u'Submit'],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'html': [
+                u'<div class="panel-event">\r\n<div'
+                'class="panel-event-header row">\r\n<div class="col-md-8'
+                'event-logo">'
+                '<em><strong><img class="img-rounded"'
+                'src="|| logo ||" /></strong></em></div>\r\n\r\n<div'
+                'class="col-md-4'
+                'info-panel" style="padding-left:0!important">\r\n<div'
+                'class="event-start-date-month"><em><strong>|| startdate_month'
+                '||</strong></em></div>\r\n\r\n<div'
+                'class="event-start-date-day"><em><strong>|| startdate_day'
+                '||</strong></em></div>\r\n\r\n<div'
+                'class="event-title"><em><strong>|| title'
+                '||</strong></em></div>\r\n</div>\r\n</div>\r\n\r\n<div'
+                'class="panel-event-body">\r\n<div class="box row">\r\n<div'
+                'class="col-md-8" style="padding:0 !important">\r\n<div'
+                'class="event-description"><em><strong>|| description'
+                '||</strong></em></div>\r\n</div>\r\n\r\n<div class="col-md-4"'
+                '>\r\n<div class="event-qr" id="qrcode">&nbsp;</div>'
+                '\r\n</div>\r\n</div>\r\n</div>\r\n</div>\r\n'
+            ]
+        }
+        form = EventDesignForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_edit_design_form_invalid(self):
+        form_data = {
+            u'Edit': [u'Submit'],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'html': []
+        }
+        form = EventDesignForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+
+class EditEventDesignViewTest(TestBase):
+
+    def setUp(self):
+        super(EditEventDesignViewTest, self).setUp()
+        self.banner = BannerFactory()
+        self.event = EventFactory()
+
+    def test_form_post_form_valid(self):
+
+        form_data = {
+            u'Edit': [u'Submit'],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'html': [
+                u'<div>\r\n<div>\r\n<div>'
+                '<em><strong><img '
+                'src="|| logo ||" /></strong></em></div>\r\n\r\n<div>\r\n<div>'
+                '<em><strong>|| startdate_month'
+                '||</strong></em></div>\r\n\r\n<div '
+                '><em><strong>|| startdate_day'
+                '||</strong></em></div>\r\n\r\n<div>'
+                '<em><strong>|| title'
+                '||</strong></em></div>\r\n</div>\r\n</div>\r\n\r\n<div>'
+                '\r\n<div>\r\n<div '
+                'style="padding:0 !important">\r\n<div>'
+                '<em><strong>|| description'
+                '||</strong></em></div>\r\n</div>\r\n\r\n<div>'
+                '\r\n<div id="qrcode">&nbsp;</div>'
+                '\r\n</div>\r\n</div>\r\n</div>\r\n</div>'
+            ]
+        }
+
+        response = self.client.post("/banner/{}/event/{}/".format(
+            self.banner.id,
+            self.event.id,
+        ), form_data, follow=True)
+
+        self.assertEquals(200, response.status_code)
+
+        saved_event = Event.objects.select_related(
+            'design',
+        ).get(
+            pk=self.event.id,
+        )
+        self.assertEquals(self.event, saved_event)
+        self.assertEquals(form_data['html'][0], saved_event.design.html)
+
+    def test_form_post_form_invalid(self):
+
+        form_data = {
+            u'Edit': [u'Submit'],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'html': []
+        }
+
+        response = self.client.post("/banner/{}/event/{}/".format(
+            self.banner.id,
+            self.event.id,
+        ), form_data, follow=True)
+
+        self.assertEquals(200, response.status_code)
+        self.assertFormError(response, 'form', None, "Can't submit it empty!")
+
+    def test_context_data(self):
+
+        response = self.client.get("/banner/{}/event/{}/".format(
+            self.banner.id,
+            self.event.id,
+        ), follow=True)
+
+        self.assertTrue(
+            isinstance(response.context_data['form'], EventDesignForm)
+        )
+        self.assertTrue(
+            isinstance(response.context_data['view'], EditEventDesignView)
+        )
+        self.assertEquals(self.event, response.context_data['event'])
+        self.assertEquals(200, response.status_code)
+
+    def test_form_initial_data(self):
+
+        default_event_design = EventDesign.objects.get(id=1)
+
+        response = self.client.get("/banner/{}/event/{}/".format(
+            self.banner.id,
+            self.event.id,
+        ), follow=True)
+
+        self.assertEquals(
+            response.context_data['form'].initial['html'],
+            default_event_design.html
+        )

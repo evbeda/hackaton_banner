@@ -17,6 +17,13 @@
     <div class="page-body">
         <div class="container" style="padding-top: 80px;">
               {% csrf_token %}
+              {% if form.non_field_errors %}
+                <div class="non-field-errors">
+                  {% for err in form.non_field_errors %}
+                    <p class="form-error">{{ err }}</p>
+                  {% endfor %}
+                </div>
+              {% endif %}
               {{ form.media }}
               {% for field in form %}
                 {{ field }}
