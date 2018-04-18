@@ -8,7 +8,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('banner', '0016_eventdesign_html'),
+        ('banner', '0017_auto_20180413_1713'),
     ]
 
     operations = [

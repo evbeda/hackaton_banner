@@ -43,12 +43,12 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
     template_name = 'events_list.html'
     success_url = reverse_lazy('index')
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, *args, **kwargs):
 
         context = super(
             BannerNewEventsSelectedCreateView,
             self
-        ).get_context_data(**kwargs)
+        ).get_context_data()
 
         social_auth = self.request.user.social_auth.filter(
             provider='eventbrite'
@@ -57,30 +57,34 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
             access_token = social_auth[0].access_token
             eventbrite = Eventbrite(access_token)
             self.events = eventbrite.get('/users/me/events/')['events']
-
+        if self.kwargs:
+            existing_events = Event.objects.filter(banner_id=self.kwargs['pk'])
+            list_evb_id = [event.evb_id for event in existing_events]
+        else:
+            list_evb_id = []
         data_event = []
         for event in self.events:
-            if event['logo'] is not None:
-                logo = event['logo']['url']
-            else:
-                logo = 'none'
-
             if parse_date(event['start']['local']) >= datetime.today():
+                if int(event['id']) not in list_evb_id:
+                    if event['logo'] is not None:
+                        logo = event['logo']['url']
+                    else:
+                        logo = 'none'
+                    data = {
+                        'title': event['name']['text'],
+                        'description': event['description']['text'],
+                        'start': event['start']['local'].replace('T', ' '),
+                        'end': event['end']['local'].replace('T', ' '),
+                        'organizer': event['organizer_id'],
+                        'evb_id': event['id'],
+                        'evb_url': event['url'],
+                        'logo': logo,
 
-                data = {
-                    'title': event['name']['text'],
-                    'description': event['description']['text'],
-                    'start': event['start']['local'].replace('T', ' '),
-                    'end': event['end']['local'].replace('T', ' '),
-                    'organizer': event['organizer_id'],
-                    'evb_id': event['id'],
-                    'evb_url': event['url'],
-                    'logo': logo,
-                }
-                data_event.append(data)
+                    }
+                    data_event.append(data)
 
         messages = []
-        if data_event == []:
+        if data_event == [] and 'existing_events' not in locals():
             messages = 'You dont have active events'
             context['messages'] = messages
         else:
@@ -90,14 +94,30 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                 form=forms.EventForm,
                 extra=len(data_event),
             )
-
-            formset = EventFormSet(
-                initial=data_event,
-                queryset=Event.objects.none(),
-            )
-
+            if self.kwargs:
+                formset = EventFormSet(
+                    initial=data_event,
+                    queryset=Event.objects.filter(
+                        banner_id=self.kwargs['pk']
+                    ),
+                )
+            else:
+                formset = EventFormSet(
+                    initial=data_event,
+                    queryset=Event.objects.none(),
+                )
             context['formset'] = formset
         return context
+
+    def get_form_kwargs(self, *args, **kwargs):
+        if self.kwargs:
+            banner = Banner.objects.get(id=self.kwargs['pk'])
+            kwargs = super(
+                BannerNewEventsSelectedCreateView, self
+            ).get_form_kwargs()
+            kwargs['initial']['title'] = banner.title
+            kwargs['initial']['description'] = banner.description
+        return kwargs
 
     def edit_banner(self, form, formset, pk, *args, **kwargs):
         form.instance.user = self.request.user
@@ -107,56 +127,65 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         updating_banner.save()
         updating_events = Event.objects.filter(banner_id=self.kwargs['pk'])
         events_evb_id_list = [event.evb_id for event in updating_events]
-        updated_events = formset.save(commit=False)
+        updated_events = formset.cleaned_data
         '''delete events'''
-        ev_id_list = [
-            event.evb_id for event in updated_events
-            if event is not None
+        updated_evb_id_list = [
+            event['evb_id'] for event in updated_events
+            if event['selection']
         ]
         for updating_event in updating_events:
-            if updating_event.evb_id not in ev_id_list:
+            if updating_event.evb_id not in updated_evb_id_list:
                 Event.objects.get(id=updating_event.id)
                 updating_event.delete()
         for event in updated_events:
-            if event is not None:
+            if event['selection']:
 
                 '''create evetns'''
-                if event.evb_id not in events_evb_id_list:
+                if int(event['evb_id']) not in events_evb_id_list:
                     e_design = EventDesign.objects.get(
                         id=DEFAULT_EVENT_DESIGN,
                     )
-                    event.banner = updating_banner
-                    event.design = e_design
-                    if event.custom_logo:
+                    new_event = Event()
+                    new_event.banner = updating_banner
+                    new_event.design = e_design
+                    if event['custom_logo']:
                         fs = FileSystemStorage()
                         filename = fs.save(
-                            event.custom_logo.name,
-                            event.custom_logo
+                            event['custom_logo'].name,
+                            event['custom_logo']
                         )
-                        event.custom_logo = fs.url(filename)
-                    event.save()
+                        new_event.custom_logo = fs.url(filename)
+                    new_event.title = event['title']
+                    new_event.description = event['description']
+                    new_event.start = event['start']
+                    new_event.end = event['end']
+                    new_event.logo = event['logo']
+                    new_event.organizer = event['organizer']
+                    new_event.evb_id = event['evb_id']
+                    new_event.evb_url = event['evb_url']
+                    new_event.custom_title = event['custom_title']
+                    new_event.custom_description = event['custom_description']
+                    new_event.save()
                 else:
                     for updating_event in updating_events:
-
                         '''update events'''
-                        if event.evb_id == updating_event.evb_id:
-                            updating_event.custom_title = event.custom_title
+                        if int(event['evb_id']) == updating_event.evb_id:
+                            updating_event.custom_title = event['custom_title']
                             updating_event.custom_description \
-                                = event.custom_description
-                            updating_event.start = event.start
-                            updating_event.end = event.end
+                                = event['custom_description']
                             try:
-                                if event.custom_logo:
+                                if event['custom_logo']:
                                     fs = FileSystemStorage()
                                     filename = fs.save(
-                                        event.custom_logo.name,
-                                        event.custom_logo
+                                        event['custom_logo'].name,
+                                        event['custom_logo']
                                     )
                                     updating_event.custom_logo \
                                         = fs.url(filename)
-                                updating_event.save()
+                                # updating_event.save()
                             except IntegrityError as e:
                                 print e.message
+                            updating_event.save()
         return super(
             BannerNewEventsSelectedCreateView,
             self,
@@ -250,109 +279,19 @@ class BannerView(TemplateView, LoginRequiredMixin):
         return context
 
 
-
-
-
-
-
-
-
-
-
 @method_decorator(login_required, name='dispatch')
-class BannerDetailView(FormView, LoginRequiredMixin):
-    form_class = forms.BannerForm
-    template_name = 'events_detail.html'
-    success_url = reverse_lazy('index')
-    # model = Banner
+class BannerDetailView(DetailView, LoginRequiredMixin):
 
-<<<<<<< HEAD
     model = Banner
 
-=======
->>>>>>> starting
     def get_context_data(self, **kwargs):
         context = super(BannerDetailView, self).get_context_data(**kwargs)
         banner = Banner.objects.get(id=self.kwargs['pk'])
         events = Event.objects.filter(banner=banner)
 
-        numbers = [x + 1 for x in range(len(events))]
-        import ipdb; ipdb.set_trace()
-
-        data_event = []
-        for event in events:
-            if event.logo is not None:
-                logo = event.logo
-            else:
-                logo = 'none'
-                data = {
-                    'title': event.title,
-                    'description': event.description,
-                    'start': event.start,
-                    'end': event.end,
-                    'organizer': event.organizer_id,
-                    'evb_id': event.evb_id,
-                    'evb_url': event.evb_url,
-                    'logo': logo,
-                    'order': order,
-                }
-                data_event.append(data)
-
-
-            EventFormSet = modelformset_factory(
-                Event,
-                form=forms.EventForm,
-                extra=len(data_event),
-            )
-
-            formset = EventFormSet(
-                initial=data_event,
-                queryset=Event.objects.none(),
-            )
-        context['numbers'] = numbers
         context['banner'] = banner
         context['events'] = events
-        context['formset'] = formset
         return context
-
-
-    def post(self, request, *args, **kwargs):
-
-        EventFormSet = modelformset_factory(
-            Event,
-            form=forms.EventForm,
-        )
-
-        formset = EventFormSet(
-            request.POST,
-            request.FILES,
-            queryset=Event.objects.none(),
-        )
-        if formset.is_valid():
-
-            return self.form_valid(formset)
-        else:
-            return self.form_invalid(formset)
-
-    def form_valid(self, form, formset):
-        # form.instance.user = self.request.user
-        events = formset.save(commit=False)
-
-
-        return super(
-            BannerDetailView,
-            self,
-        ).form_valid(form)
-
-
-
-
-
-
-
-
-
-
 
 @method_decorator(login_required, name='dispatch')
 class BannerPreview(TemplateView, LoginRequiredMixin):
@@ -387,6 +326,9 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
         return context
 
     def get_events_data(self, events, banner):
+        '''events order'''
+        # events.sort(key=lambda tup: tup[0])
+
         for event in events:
             idx, event = event
             event = self.replace_data(event)

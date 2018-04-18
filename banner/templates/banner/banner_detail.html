@@ -19,14 +19,6 @@
                 <h5 class="card-title" style="text-decoration: bold;">{{ event.title }}</h5>
                 <p class="card-text" style="text-size: 10px;">{{ event.description }}</p>
                 <a href="{% url 'edit_design' pk=banner.pk epk=event.pk %}" class="btn btn-primary">Edit view</a>
-                <p>select</p>
-
-                <select class="selectpicker">
-                  {% for number in numbers %}
-                  <option>{{number}}</option>
-                  {% endfor %}
-                </select>
-
             </div>
           </div>
         </div>
