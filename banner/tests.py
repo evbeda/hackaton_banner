@@ -163,7 +163,6 @@ class EventViewTest(TestBase):
         self.client.get('/banner/new/')
         mock_eventbrite_get.assert_called_once()
 
-
 class EventDesignFormTest(TestBase):
 
     def setUp(self):

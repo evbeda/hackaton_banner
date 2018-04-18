@@ -313,29 +313,29 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
     def replace_data(self, event):
         if event.custom_title:
             event.design.html = unicode(event.design.html).replace(
-                '|| title ||', str(event.custom_title)
+                '|| title ||', unicode(event.custom_title)
             )
         else:
             event.design.html = unicode(event.design.html).replace(
-                '|| title ||', str(event.title)
+                '|| title ||', unicode(event.title)
             )
 
         if event.custom_description:
             event.design.html = unicode(event.design.html).replace(
-                '|| description ||', str(event.custom_description)
+                '|| description ||', unicode(event.custom_description)
             )
         else:
             event.design.html = unicode(event.design.html).replace(
-                '|| description ||', str(event.description)
+                '|| description ||', unicode(event.description)
             )
 
         if event.custom_logo:
             event.design.html = unicode(event.design.html).replace(
-                '|| logo ||', str(event.custom_logo)
+                '|| logo ||', unicode(event.custom_logo)
             )
         else:
             event.design.html = unicode(event.design.html).replace(
-                '|| logo ||', str(event.logo)
+                '|| logo ||', unicode(event.logo)
             )
 
         event.design.html = unicode(event.design.html).replace(
@@ -344,15 +344,15 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
         )
 
         event.design.html = unicode(event.design.html).replace(
-            '|| startdate_day ||', str(event.start.day)
+            '|| startdate_day ||', unicode(event.start.day)
         )
 
         event.design.html = unicode(event.design.html).replace(
-            '|| evb_url ||', str(event.evb_url)
+            '|| evb_url ||', unicode(event.evb_url)
         )
 
-        event.design.html = str(event.design.html).replace(
-            '|| id ||', str(event.id)
+        event.design.html = unicode(event.design.html).replace(
+            '|| id ||', unicode(event.id)
         )
 
         return event
