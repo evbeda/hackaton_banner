@@ -138,6 +138,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
             event['evb_id'] for event in updated_events
             if event['selection']
         ]
+        # import ipdb; ipdb.set_trace()
         for updating_event in updating_events:
             if updating_event.evb_id not in updated_evb_id_list:
                 Event.objects.get(id=updating_event.id)
@@ -212,6 +213,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
             request.FILES,
             queryset=Event.objects.none(),
         )
+        # import ipdb; ipdb.set_trace()
         if form.is_valid() and formset.is_valid():
             if not any([
                     selection_cleaned_data['selection']
