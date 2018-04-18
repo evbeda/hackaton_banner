@@ -312,42 +312,42 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
 
     def replace_data(self, event):
         if event.custom_title:
-            event.design.html = str(event.design.html).replace(
-                '|| title ||', event.custom_title
+            event.design.html = unicode(event.design.html).replace(
+                '|| title ||', str(event.custom_title)
             )
         else:
-            event.design.html = str(event.design.html).replace(
-                '|| title ||', event.title
+            event.design.html = unicode(event.design.html).replace(
+                '|| title ||', str(event.title)
             )
 
         if event.custom_description:
-            event.design.html = str(event.design.html).replace(
-                '|| description ||', event.custom_description
+            event.design.html = unicode(event.design.html).replace(
+                '|| description ||', str(event.custom_description)
             )
         else:
-            event.design.html = str(event.design.html).replace(
-                '|| description ||', event.description
+            event.design.html = unicode(event.design.html).replace(
+                '|| description ||', str(event.description)
             )
 
         if event.custom_logo:
-            event.design.html = str(event.design.html).replace(
+            event.design.html = unicode(event.design.html).replace(
                 '|| logo ||', str(event.custom_logo)
             )
         else:
-            event.design.html = str(event.design.html).replace(
+            event.design.html = unicode(event.design.html).replace(
                 '|| logo ||', str(event.logo)
             )
 
-        event.design.html = str(event.design.html).replace(
+        event.design.html = unicode(event.design.html).replace(
             '|| startdate_month ||',
             calendar.month_name[event.start.month][:3].upper() + '.'
         )
 
-        event.design.html = str(event.design.html).replace(
+        event.design.html = unicode(event.design.html).replace(
             '|| startdate_day ||', str(event.start.day)
         )
 
-        event.design.html = str(event.design.html).replace(
+        event.design.html = unicode(event.design.html).replace(
             '|| evb_url ||', str(event.evb_url)
         )
 
