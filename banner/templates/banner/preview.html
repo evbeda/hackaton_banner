@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
 {% load qr_tags %}
-{% load banner_extras %}
 <html>
   <head>
     <meta charset="UTF-8" />
@@ -18,22 +17,27 @@
             <img src="{% static 'images/Eventbrite_wordmark_orange.png' %}" />
         </div>
         {% for event_data in events_data %}
-        <div class="step slide" data-x="{{ event_data.data_x }}"
-                                data-y="{{ event_data.data_y }}"
-                                data-rotate="{{ event_data.data_rotate }}"
-                                data-scale="{{ event_data.data_scale }}"
-                                id="event-{{ event_data.event.id }}">
-            <div class="event-container">
-                {{ event_data.event.design.html|safe }} 
-            </div>
-        </div>
-        <script type="text/javascript">
-            new QRCode(
-                document.getElementById("qrcode"),
-                "{{ event_data.event.evb_url }}"
-            );
-        </script>
+          <div class="step slide" data-x="{{ event_data.data_x }}"
+                                  data-y="{{ event_data.data_y }}"
+                                  data-rotate="{{ event_data.data_rotate }}"
+                                  data-scale="{{ event_data.data_scale }}"
+                                  id="event-{{ event_data.event.id }}">
+              <div class="event-container">
+                  {{ event_data.event.design.html|safe }} 
+              </div>
+          </div>
+          <script type="text/javascript">
+              new QRCode(
+                document.getElementById("qrcode-{{ event_data.event.id }}"),
+                  {
+                    text: "{{ event_data.event.evb_url }}",
+                    width: 256,
+                    height: 256,
+                  }
+              );
+          </script>
         {% endfor %}
+    
     </div>
     <script src="{% static 'js/impress.js' %}"></script>
     <script>
