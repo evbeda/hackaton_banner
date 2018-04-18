@@ -353,6 +353,7 @@ class BannerPreview(TemplateView, LoginRequiredMixin):
 
         return event
 
+
 @method_decorator(login_required, name='dispatch')
 class EditEventDesignView(FormView, LoginRequiredMixin):
 
@@ -368,14 +369,25 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
 
     def get_form_kwargs(self):
         kwargs = super(EditEventDesignView, self).get_form_kwargs()
-        kwargs['initial']['html'] = EventDesign.objects.get(
-            id=DEFAULT_EVENT_DESIGN
-        ).html
+        event = Event.objects.select_related(
+            'design'
+        ).get(
+            pk=self.kwargs['epk']
+        )
+        kwargs['initial']['html'] = event.design.html
         return kwargs
 
     def post(self, request, *args, **kwargs):
+
+        event = Event.objects.select_related(
+            'design'
+        ).get(
+            pk=self.kwargs['epk']
+        )
+
         form = forms.EventDesignForm(
             request.POST,
+            instance=event.design,
         )
 
         if form.is_valid():
@@ -391,11 +403,7 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
     def form_valid(self, form, *args, **kwargs):
         form.instance.user = self.request.user
         event_design = form.save()
-
-        event = Event.objects.get(pk=self.kwargs['epk'])
         event_design.save()
-        event.design = event_design
-        event.save()
 
         return super(
             EditEventDesignView,
