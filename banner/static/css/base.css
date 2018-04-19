@@ -1,9 +1,4 @@
-@font-face {
-   font-family: 'Atrian-FontZillian';
-   src: url(../fonts/atrian-1.ttf) format("truetype"),
-   local('Atrian-FontZillian');;
-}
-.text-black {
+  .text-black {
   color: black;
 }
 .text-red {
@@ -26,7 +21,7 @@
   border: 1px solid #f0f0f0;
 }
 h1, h2, h3, h4, h5{
-  font-family: 'Atrian-FontZillian', Monaco, monospace;
+  font-family: 'benton-regular', Monaco, monospace;
   font-weight: bold;
 }
 h1 {

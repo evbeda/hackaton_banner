@@ -3,7 +3,8 @@
 {% load bootstrap3 %}
 {% load staticfiles %}
 {% block content %}
-<link href="{% static 'css/banner_new.css' %}" rel="stylesheet">
+
+<link href="{% static 'css/banner-new.css' %}" rel="stylesheet">
 <a style="padding-left: 22px" href="{% url 'index' %}">Back</a>
 {% if messages %}
   <h3>{{ messages }}</h3>
@@ -35,8 +36,8 @@
           {% endif %}
           <div class="row">
             <div class="section-title">
-              <h2>Informacion del banner</h2>
-              <p>Ingresa aqui la informacion correspondiente para que luego
+              <h2>Información del banner</h2>
+              <p>Ingresa aquí la información correspondiente para que luego
               puedas identificar este banner y su contenido.</p>
             </div>
           {% for field in form %}
@@ -52,7 +53,8 @@
           <div class="row" style="margin-top: 40px;">
             <div class="section-title">
               <h2>Seleccionar eventos</h2>
-              <p>Selecciona los eventos que apareceran cuando el banner este
+
+              <p>Selecciona los eventos que quieres que aparezcan cuando el banner esté
               publicado.</p>
             </div>
           </div>
@@ -73,7 +75,7 @@
                     </div>
                     <div class="col col-md-4 px-2">
                         <h4 style="padding-top: 4px" >Descripción</h4>
-                          <p>{{ event_form.description.value }}</p>
+                          <p class="text-truncate" style="max-width: 400px">{{ event_form.description.value }}</p>
                     </div>
                 </div>
                 <!-- card -->
