@@ -4,7 +4,7 @@
 {% load staticfiles %}
 {% block content %}
 <link href="{% static 'css/banner_new.css' %}" rel="stylesheet">
-<a href="{% url 'index' %}">Back</a>
+<a style="padding-left: 22px" href="{% url 'index' %}">Back</a>
 {% if messages %}
       <h3>{{ messages }}</h3>
       </div>
@@ -45,51 +45,58 @@
       </div>
       {{ formset.management_form }}
       {{ formset.media }}
-      <div class="row" style="margin-top: 40px;">
-        <div class="section-title">
-          <h2>Seleccionar eventos</h2>
-          <p>Selecciona los eventos que apareceran cuando el banner este
-          publicado.</p>
-        </div>
-      </div>
-      {% for event_form in formset %}
-          <div class="row col-md-12" style="padding-top: 20px;
-              margin-bottom:50px;">
-              <div class="col-md-5">
-                  <div class="card" style="width: 18rem; margin-bottom:20px;">
-                    <img class="card-img-top" src="{{ event_form.logo.value }}" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title" style="text-decoration: bold;">{{ event_form.title.value }}</h5>
-                        <p class="card-text" style="text-size: 10px;">{{ event_form.description.value }}</p>
-                    </div>
-                  </div>
-              </div>
-              <!-- <h5>Start datetime</h5> -->
-              <h4>{{ event_form.start }}</h4>
-              <!-- <h5>End datetime</h5> -->
-              <h4>{{ event_form.end }}</h4>
-              <div class="col-md-6">
-                  <div class="form-group">
-                          {{ event_form.title }}
-                          {% bootstrap_field event_form.custom_title %}
-                  </div>
-                  <div class="form-group">
-                          {{ event_form.description }}
-                          {% bootstrap_field event_form.custom_description %}
-                  </div>
-                  <div class="form-group">
-                      {{ event_form.logo }}
-                      {% bootstrap_field event_form.custom_logo %}
-                  </div>
-              </div>
-              <div class="col-md-1" style="margin-top:120px;">
-                  {{ event_form.selection }}
-              </div>
+      <div class="row">
+          <div class="row" style="margin-top: 40px;">
+            <div class="section-title">
+              <h2>Seleccionar eventos</h2>
+              <p>Selecciona los eventos que apareceran cuando el banner este
+              publicado.</p>
+            </div>
           </div>
-              
+          <div class="col-md-12">
+            {% for event_form in formset %}
+              <div class="col col-md-12 border js-event-card" style="margin-top:10px">
+                <!-- card -->
+                <div class="row">
+                    <div class="col col-md-1 py-4 d-flex align-items-center js-checkbox-event-item">
+                      {{ event_form.selection }}
+                    </div>
+                    <div class="col col-md-3 py-2  d-flex align-items-center">
+                       <img height="100" width="200" style="padding-right: 30px" src="{{ event_form.logo.value }}">
+                    </div>
+                    <div class="col col-md-4 px-2">
+                        <h4 style="padding-top: 4px" >Título</h4>
+                          <p>{{ event_form.title.value }}</p>
+                    </div>
+                    <div class="col col-md-4 px-2">
+                        <h4 style="padding-top: 4px" >Descripción</h4>
+                          <p>{{ event_form.description.value }}</p>
+                    </div>
+                </div>
+                <!-- card -->
+                <div class="d-none js-link-custom-event">
+                  <button type="button" class="btn btn-link">Personalizar datos del evento</button>
+                </div>
+                <div class="col-md-6 d-none js-custom-event-form">
+                    <div class="form-group">
+                            {{ event_form.title }}
+                            {% bootstrap_field event_form.custom_title %}
+                    </div>
+                    <div class="form-group">
+                            {{ event_form.description }}
+                            {% bootstrap_field event_form.custom_description %}
+                    </div>
+                    <div class="form-group">
+                        {{ event_form.logo }}
+                        {% bootstrap_field event_form.custom_logo %}
+                    </div>
+                </div>
+              </div>
           {{ event_form.organizer }}
           {{ event_form.evb_id }}
           {{ event_form.evb_url }}
+          {{ event_form.start }}
+          {{ event_form.end }}
       {% endfor %}
       </div>
       <div class="d-flex justify-content-start">
@@ -100,5 +107,34 @@
   </form>
 
 {% endif %}
+
+<script>
+  $(document).ready(function() {
+    $(document).on('change', '.js-checkbox-event-item input', function(e) {
+      var $target = $(e.target)
+          $targetRow = $target.parents('.js-event-card')
+          $hiddenLink = $targetRow.children('.js-link-custom-event')
+          $hiddenForm = $targetRow.children('.js-custom-event-form')
+
+      if ($target.is(':checked')) {
+        $hiddenLink.removeClass('d-none')
+      } else {
+        $hiddenLink.addClass('d-none')
+        $hiddenForm.addClass('d-none')
+      }
+    })
+    $('.js-link-custom-event').click(function(e) {
+      var $target = $(e.target)
+          $targetRow = $target.parents('.js-event-card')
+          $hiddenForm = $targetRow.children('.js-custom-event-form')
+
+      if ($target.on('click')) {
+         $hiddenForm.removeClass('d-none')
+      } else {
+         $hiddenForm.addClass('d-none')
+      }
+    })
+  })
+</script>
 {% endblock %}
-    
+
