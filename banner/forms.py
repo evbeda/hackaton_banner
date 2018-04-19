@@ -63,6 +63,11 @@ class EventForm(forms.ModelForm):
         if cd['selection']:
             return m
 
+    def __init__(self, *args, **kwargs):
+        super(EventForm, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs:
+            self.fields['selection'].initial = True
+
 class BannerForm(forms.ModelForm):
 
     description = forms.CharField(

@@ -6,15 +6,18 @@
 <link href="{% static 'css/banner_new.css' %}" rel="stylesheet">
 <a href="{% url 'index' %}">Back</a>
 {% if messages %}
-      <h3>{{ messages }}</h3>
-      </div>
+  <h3>{{ messages }}</h3>
 {% else %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
   <div class="create-banner-header box">
     <div class="row">
       <div class="col-md-11">
-        <h2>Nuevo banner</h2>
+        {% if not formset.queryset %}
+          <h2>Nuevo banner</h2>
+          {% else %}
+          <h2>Editar banner</h2>
+        {% endif %}
       </div>
     </div>
     {{ formset.management_form }}
@@ -52,53 +55,68 @@
           publicado.</p>
         </div>
       </div>
-      {% for event_form in formset %}
-          <div class="row col-md-12" style="padding-top: 20px;
-              margin-bottom:50px;">
-              <div class="col-md-5">
-                  <div class="card" style="width: 18rem; margin-bottom:20px;">
-                    <img class="card-img-top" src="{{ event_form.logo.value }}" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title" style="text-decoration: bold;">{{ event_form.title.value }}</h5>
-                        <p class="card-text" style="text-size: 10px;">{{ event_form.description.value }}</p>
+        {% for event_form in formset %}
+            <div class="row col-md-12" style="padding-top: 20px;
+                margin-bottom:50px;">
+                <div class="col-md-5">
+                    <div class="card" style="width: 18rem; margin-bottom:20px;">
+                      <img class="card-img-top" src="{{ event_form.logo.value }}" alt="Card image cap">
+                      <div class="card-body">
+                          <h5 class="card-title" style="text-decoration: bold;">{{ event_form.title.value }}</h5>
+                          <p class="card-text" style="text-size: 10px;">{{ event_form.description.value }}</p>
+                      </div>
                     </div>
-                  </div>
-              </div>
-              <!-- <h5>Start datetime</h5> -->
-              <h4>{{ event_form.start }}</h4>
-              <!-- <h5>End datetime</h5> -->
-              <h4>{{ event_form.end }}</h4>
-              <div class="col-md-6">
-                  <div class="form-group">
-                          {{ event_form.title }}
-                          {% bootstrap_field event_form.custom_title %}
-                  </div>
-                  <div class="form-group">
-                          {{ event_form.description }}
-                          {% bootstrap_field event_form.custom_description %}
-                  </div>
-                  <div class="form-group">
-                      {{ event_form.logo }}
-                      {% bootstrap_field event_form.custom_logo %}
-                  </div>
-              </div>
-              <div class="col-md-1" style="margin-top:120px;">
-                  {{ event_form.selection }}
-              </div>
-          </div>
-              
-          {{ event_form.organizer }}
-          {{ event_form.evb_id }}
-          {{ event_form.evb_url }}
-      {% endfor %}
+                </div>
+                <!-- <h5>Start datetime</h5> -->
+                <h4>{{ event_form.start }}</h4>
+                <!-- <h5>End datetime</h5> -->
+                <h4>{{ event_form.end }}</h4>
+                <div class="col-md-6">
+                    <div class="form-group">
+                      {{ event_form.title }}
+                      {% bootstrap_field event_form.custom_title %}
+                    </div>
+                    <div class="form-group">
+                      {{ event_form.description }}
+                      {% bootstrap_field event_form.custom_description %}
+                    </div>
+                    <div class="form-group">
+                      {% if not formset.queryset %}
+                        {{ event_form.logo }}
+                        {% bootstrap_field event_form.custom_logo %}
+                      {% else %}
+                        {{ event_form.logo }}
+                        {% bootstrap_field event_form.custom_logo %}
+                          {% if event_form.custom_logo.value %}
+                          <div class="card" style="width: 18rem; margin-bottom:20px;">
+                            <img class="card-img-top" src="{{ event_form.custom_logo.value }}" alt="Card image cap">
+                          </div>
+                          {% endif %}
+                      {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-1" style="margin-top:120px;">
+                    {{ event_form.selection }}
+                </div>
+            </div>
+            {{ event_form.organizer }}
+            {{ event_form.evb_id }}
+            {{ event_form.evb_url }}
+            {{ event_form.id }}
+        {% endfor %}
       </div>
       <div class="d-flex justify-content-start">
-        <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
-        float-right">Crear banner</button>
+        {% if not formset.queryset %}
+          <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
+          float-right">Crear banner</button>
+        {% else %}
+          <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
+          float-right">Confirmar edicion</button>
+        {% endif %}
       </div>
   </div>
   </form>
 
 {% endif %}
 {% endblock %}
-    
+
