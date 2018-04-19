@@ -6,12 +6,6 @@
 .text-black {
   color: black;
 }
-.btn-submit {
-  vertical-align: middle;
-  background: white;
-  color: #f66a26;
-  border: 1px solid #f6f6f6;
-}
 .text-red {
   color: red;
 }
@@ -39,17 +33,17 @@ h1 {
   font-size: 50px;
 }
 .date {
-    float: right;
-    color: #828282;
+  float: right;
+  color: #828282;
 }
 .save {
-    float: right;
+  float: right;
 }
 .top-menu, .top-menu:hover, .top-menu:visited {
-    color: #ffffff;
-    float: right;
-    font-size: 26pt;
-    margin-right: 20px;
+  color: #ffffff;
+  float: right;
+  font-size: 26pt;
+  margin-right: 20px;
 }
 
 .glyphicon-ring {

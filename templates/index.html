@@ -1,9 +1,10 @@
 {#{% load activeurl%}#}
 {% extends './shared/base.html' %}
+{% load staticfiles %}
 
 {% block content %}
 <div class="page-header box">
-  <h2>Your banners</h2>
+  <h2>Tus banners</h2>
 </div>
 <div class="page-body">
   <div class="container" style="padding-top: 20px;">
@@ -32,7 +33,9 @@
         {% endfor %}
       {% else %}
           <div>
-              <h1>No banners yet!</h1>
+            <img src="{% static 'images/notbannersyet.png' %}" />
+            <p hidden>No banners yet</p>
+            <!-- <div hidden>No banners yet!<div> -->
           </div>
       {% endif %}
 

@@ -14,11 +14,7 @@
   <div class="create-banner-header box">
     <div class="row">
       <div class="col-md-11">
-        <h2 style="margin: 0 !important;">New banner</h2>
-      </div>
-      <div class="d-flex justify-content-start">
-        <p><input type="submit" name="Events Selected" class="btn-submit btn btn-primary
-        float-right"></p>
+        <h2>Nuevo banner</h2>
       </div>
     </div>
     {{ formset.management_form }}
@@ -26,7 +22,7 @@
   </div>
   <div class="create-banner-body">
     <div class="container">
-      <div class="row">
+      <div class="row" style="padding-top: 40px;">
           {% if form.non_field_errors %}
             <div class="non-field-errors">
               {% for err in form.non_field_errors %}
@@ -35,11 +31,10 @@
             </div>
           {% endif %}
           <div class="row">
-            <div class="section-number">
-              1 
-            </div>
             <div class="section-title">
-              <h3>Banner info</h3>
+              <h2>Informacion del banner</h2>
+              <p>Ingresa aqui la informacion correspondiente para que luego
+              puedas identificar este banner y su contenido.</p>
             </div>
           {% for field in form %}
               <div class="col-md-12">
@@ -50,12 +45,11 @@
       </div>
       {{ formset.management_form }}
       {{ formset.media }}
-      <div class="row">
-        <div class="section-number">
-          2 
-        </div>
+      <div class="row" style="margin-top: 40px;">
         <div class="section-title">
-          <h3>Select events</h3>
+          <h2>Seleccionar eventos</h2>
+          <p>Selecciona los eventos que apareceran cuando el banner este
+          publicado.</p>
         </div>
       </div>
       {% for event_form in formset %}
@@ -98,7 +92,10 @@
           {{ event_form.evb_url }}
       {% endfor %}
       </div>
-    
+      <div class="d-flex justify-content-start">
+        <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
+        float-right">Crear banner</button>
+      </div>
   </div>
   </form>
 
