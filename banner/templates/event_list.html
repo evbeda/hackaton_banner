@@ -6,15 +6,18 @@
 <link href="{% static 'css/banner_new.css' %}" rel="stylesheet">
 <a style="padding-left: 22px" href="{% url 'index' %}">Back</a>
 {% if messages %}
-      <h3>{{ messages }}</h3>
-      </div>
+  <h3>{{ messages }}</h3>
 {% else %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
   <div class="create-banner-header box">
     <div class="row">
       <div class="col-md-11">
-        <h2>Nuevo banner</h2>
+        {% if not formset.queryset %}
+          <h2>Nuevo banner</h2>
+          {% else %}
+          <h2>Editar banner</h2>
+        {% endif %}
       </div>
     </div>
     {{ formset.management_form }}
@@ -100,8 +103,13 @@
       {% endfor %}
       </div>
       <div class="d-flex justify-content-start">
-        <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
-        float-right">Crear banner</button>
+        {% if not formset.queryset %}
+          <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
+          float-right">Crear banner</button>
+        {% else %}
+          <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
+          float-right">Confirmar edicion</button>
+        {% endif %}
       </div>
   </div>
   </form>

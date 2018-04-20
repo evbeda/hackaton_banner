@@ -68,3 +68,4 @@ class Event(models.Model):
     design = models.ForeignKey(EventDesign, null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
+    order = models.IntegerField(default=1, null=True, blank=True)
