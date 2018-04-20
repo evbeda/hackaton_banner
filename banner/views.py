@@ -192,6 +192,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         ).form_valid(form)
 
     def post(self, request, *args, **kwargs):
+        # import ipdb; ipdb.set_trace()
         form = forms.BannerForm(
             request.POST,
         )
