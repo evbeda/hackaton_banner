@@ -300,7 +300,6 @@ class BannerDetailView(DetailView, LoginRequiredMixin):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
 class BannerPreview(TemplateView, LoginRequiredMixin):
 
     template_name = 'banner/preview.html'
