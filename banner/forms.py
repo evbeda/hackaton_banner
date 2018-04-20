@@ -27,11 +27,9 @@ class EventForm(forms.ModelForm):
     )
     custom_logo = forms.FileField(required=False)
     start = forms.DateTimeField(
-        required=False,
         widget=forms.HiddenInput(),
     )
     end = forms.DateTimeField(
-        required=False,
         widget=forms.HiddenInput(),
     )
     organizer = forms.CharField(
@@ -39,7 +37,6 @@ class EventForm(forms.ModelForm):
         widget=forms.HiddenInput(),
     )
     title = forms.CharField(
-        required=False,
         widget=forms.HiddenInput(),
     )
     description = forms.CharField(
