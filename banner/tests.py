@@ -27,7 +27,9 @@ from .views import (
     EditEventDesignView,
 )
 from .forms import (
+    BannerForm,
     EventDesignForm,
+    EventForm,
 )
 
 
@@ -42,6 +44,9 @@ class TestBase(TestCase):
         )
         self.user.set_password('hello')
         self.user.save()
+        self.auth = UserSocialAuth.objects.create(
+            user=self.user, provider='eventbrite', uid="249759038146"
+        )
         login = self.client.login(username='testuser', password='hello')
         return login
 
@@ -77,9 +82,9 @@ class BannerDesignViewTest(TestBase):
         self.banner = BannerFactory()
 
     def test_banner_design_view(self):
-        response = self.client.get('/banner/' +
-                                   str(self.banner.id) +
-                                   '/preview/')
+        response = self.client.get(
+            '/banner/' + str(self.banner.id) + '/preview/'
+        )
         self.assertEqual(response.status_code, 200)
 
     def test_events_inside_banner(self):
@@ -91,9 +96,9 @@ class BannerDesignViewTest(TestBase):
         event2.banner = self.banner
         event2.save()
 
-        response = self.client.get('/banner/' +
-                                   str(self.banner.id) +
-                                   '/preview/')
+        response = self.client.get(
+            '/banner/' + str(self.banner.id) + '/preview/'
+        )
         self.assertContains(response, 'event-' + str(event1.id))
         self.assertContains(response, 'event-' + str(event2.id))
 
@@ -163,6 +168,7 @@ class EventViewTest(TestBase):
         self.client.get('/banner/new/')
         mock_eventbrite_get.assert_called_once()
 
+
 class EventDesignFormTest(TestBase):
 
     def setUp(self):
@@ -214,7 +220,7 @@ class EditEventDesignViewTest(TestBase):
         self.banner = BannerFactory()
         self.event = EventFactory()
 
-    def test_form_post_form_valid(self):
+    def test_event_design_form_post_valid(self):
 
         form_data = {
             u'Edit': [u'Submit'],
@@ -315,3 +321,236 @@ class EditEventDesignViewTest(TestBase):
             response.context_data['form'].initial['html'],
             self.event.design.html
         )
+
+
+@patch(
+    'banner.views.BannerNewEventsSelectedCreateView.get_api_events',
+    return_value=[
+        {
+            "name": {
+                "text": "Evento de prueba",
+                "html": "Evento de prueba"
+            },
+            "description": {
+                "text": "evento de prueba",
+                "html": "<P>evento de prueba<\/P>"
+            },
+            "id": "40741881063",
+            "url": "https://www.eventbrite.com.ar/e/evento-de-prueba-tickets-40741881063",
+            "start": {
+                "timezone": u'America/Argentina/Mendoza',
+                "local": u'2018-04-29T22:00:00',
+                "utc": u'2018-01-04T22:00:00Z'
+            },
+            "end": {
+                "timezone": 'America/Argentina/Mendoza',
+                "local": u'2018-04-29T23:00:00',
+                "utc": u'2018-01-05T01:00:00Z'
+            },
+            "organization_id": "236776874706",
+            "created": "2017-11-25T19:13:18Z",
+            "changed": "2018-01-05T05:23:49Z",
+            "capacity": 20,
+            "capacity_is_custom": False,
+            "status": "completed",
+            "currency": "ARS",
+            "listed": False,
+            "shareable": True,
+            "invite_only": False,
+            "online_event": False,
+            "show_remaining": True,
+            "tx_time_limit": 480,
+            "hide_start_date": False,
+            "hide_end_date": False,
+            "locale": "es_AR",
+            "is_locked": False,
+            "privacy_setting": "unlocked",
+            "is_series": False,
+            "is_series_parent": False,
+            "is_reserved_seating": False,
+            "source": "create_2.0",
+            "is_free": True,
+            "version": "3.0.0",
+            "logo_id": "38099252",
+            "organizer_id": "15852777053",
+            "venue_id": "22336362",
+            "category_id": "102",
+            "subcategory_id": None,
+            "format_id": "100",
+            "resource_uri": "https://www.eventbriteapi.com/v3/events/40741881063/",
+            "logo": {
+                "crop_mask": {
+                    "top_left": {
+                        "x": 196,
+                        "y": 184
+                    },
+                    "width": 464,
+                    "height": 232
+                },
+                "original": {
+                    "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?auto=compress&s=109e5624c733ef88316094935138451f", 
+                    "width": 835,
+                    "height": 470
+                },
+                "id": 38099252,
+                "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?h=200&w=450&auto=compress&rect=196%2C184%2C464%2C232&s=dd415facae0a66bcd1ce9178aac57f68", 
+                "aspect_ratio": "2",
+                "edge_color": "#ffffff",
+                "edge_color_set": True
+            }
+        }
+    ]
+)
+class BannerNewEventsSelectedCreateViewTest(TestBase):
+
+    def setUp(self):
+        super(BannerNewEventsSelectedCreateViewTest, self).setUp()
+
+    def test_banner_new_form_get(self, mock_api_events):
+
+        response = self.client.get("/banner/new/", follow=True)
+        self.assertEquals(200, response.status_code)
+
+    def test_banner_new_form_post_valid(self, mock_get_api_events):
+
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match'],
+            u'form-0-custom_title': [u'Wallabies vs pumas'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-1-custom_description': [u''],
+            u'form-1-custom_logo': [u''],
+            u'form-1-custom_title': [u''],
+            u'form-1-description': [u'This is one event!'],
+            u'form-1-end': [u'2021-11-27 11:30:00'],
+            u'form-1-evb_id': [u'40188254150'],
+            u'form-1-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-1-logo': [u'https://img.evbuc.com/'],
+            u'form-1-organizer': [u'15828411681'],
+            u'form-1-selection': [u'on'],
+            u'form-1-start': [u'2019-11-27 21:30:00'],
+            u'form-1-title': [u"Fernando's interview"],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'2', u'2'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+
+        response = self.client.post("/banner/new/".format(
+        ), form_data, follow=True)
+
+        self.assertEquals(200, response.status_code)
+
+        saved_banner = Banner.objects.latest('changed',)
+        saved_events = Event.objects.filter(banner=saved_banner)
+
+        default_event_design = EventDesign.objects.get(id=1)
+
+        for saved_event in saved_events:
+            self.assertTrue(
+                isinstance(saved_event, Event)
+            )
+            self.assertEquals(default_event_design, saved_event.design)
+
+    def test_form_post_form_invalid(self, mock_get_api_events):
+
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'0', u'0'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+
+        response = self.client.post("/banner/new/".format(
+        ), form_data, follow=True)
+
+        self.assertEquals(200, response.status_code)
+        self.assertFormError(response, 'form', None, "No events selected")
+
+
+class BannerFormTest(TestBase):
+
+    def setUp(self):
+        super(BannerFormTest, self).setUp()
+
+    def test_banner_form_valid(self):
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'0', u'0'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+        form = BannerForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_banner_form_invalid(self):
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'0', u'0'],
+        }
+        form = BannerForm(data=form_data)
+        self.assertFalse(form.is_valid())
+
+
+class EventFormTest(TestBase):
+
+    def setUp(self):
+        super(EventFormTest, self).setUp()
+
+    def test_event_form_valid(self):
+        form_data = {
+            u'csrfmiddlewaretoken': u'asd',
+            u'custom_description': u'A rugby match',
+            u'custom_title': u'Wallabies vs pumas',
+            u'description': u'',
+            u'end': u'2021-11-27 10:30:00',
+            u'evb_id': 44384359815,
+            u'evb_url': u'https://www.eventbrite.com/',
+            u'logo': u'none',
+            u'organizer': u'15828411681',
+            u'selection': u'on',
+            u'start': u'2021-11-27 11:30:00',
+            u'title': u'New event',
+        }
+        form = EventForm(data=form_data)
+        self.assertTrue(form.is_valid())
+
+    def test_event_form_invalid(self):
+        form_data = {
+            u'csrfmiddlewaretoken': u'asd',
+            u'custom_description': u'A rugby match',
+            u'custom_title': u'Wallabies vs pumas',
+            u'end': u'2018-04-29 22:00:00',
+            u'evb_id': 44384359815,
+            u'evb_url': u'https://www.eventbrite.com/',
+            u'logo': u'none',
+            u'organizer': u'15828411681',
+            u'selection': u'on',
+            u'start': u'2018-04-29 19:00:00',
+        }
+        form = EventForm(data=form_data)
+        self.assertFalse(form.is_valid())

@@ -43,7 +43,12 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
     template_name = 'events_list.html'
     success_url = reverse_lazy('index')
 
-    def get_context_data(self, *args, **kwargs):
+    def get_api_events(self, social_auth):
+        access_token = social_auth[0].access_token
+        eventbrite = Eventbrite(access_token)
+        return eventbrite.get('/users/me/events/')['events']
+
+    def get_context_data(self, **kwargs):
 
         context = super(
             BannerNewEventsSelectedCreateView,
@@ -54,16 +59,18 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
             provider='eventbrite'
         )
         if len(social_auth) > 0:
-            access_token = social_auth[0].access_token
-            eventbrite = Eventbrite(access_token)
-            self.events = eventbrite.get('/users/me/events/')['events']
+            events = self.get_api_events(social_auth)
+ 
         if self.kwargs:
-            existing_events = Event.objects.filter(banner_id=self.kwargs['pk'])
+            existing_events = Event.objects.filter(
+                banner_id=self.kwargs['pk'],
+            )
             list_evb_id = [event.evb_id for event in existing_events]
         else:
             list_evb_id = []
+
         data_event = []
-        for event in self.events:
+        for event in events:
             if parse_date(event['start']['local']) >= datetime.today():
                 if int(event['id']) not in list_evb_id:
                     if event['logo'] is not None:
@@ -79,16 +86,14 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                         'evb_id': event['id'],
                         'evb_url': event['url'],
                         'logo': logo,
-
                     }
                     data_event.append(data)
 
         messages = []
         if data_event == [] and 'existing_events' not in locals():
-            messages = 'You dont have active events'
+            messages.append('You dont have active events')
             context['messages'] = messages
         else:
-
             EventFormSet = modelformset_factory(
                 Event,
                 form=forms.EventForm,
@@ -212,7 +217,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                     selection_cleaned_data['selection']
                     for selection_cleaned_data in formset.cleaned_data
             ]):
-                form.add_error(NON_FIELD_ERRORS, 'No event selected')
+                form.add_error(NON_FIELD_ERRORS, 'No events selected')
                 return render(
                     request,
                     'event_list.html',
@@ -294,7 +299,7 @@ class BannerDetailView(DetailView, LoginRequiredMixin):
         context['events'] = events
         return context
 
-@method_decorator(login_required, name='dispatch')
+
 class BannerPreview(TemplateView, LoginRequiredMixin):
 
     template_name = 'banner/preview.html'
