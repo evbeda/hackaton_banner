@@ -1,7 +1,4 @@
-@font-face {
-   font-family: 'BentonSansRegular';
-   src: url(fonts/BentonSans-Regular_sOT.otf);
-}
+
 body {
   background: black;
 }
@@ -67,7 +64,7 @@ body {
 .event-title{
   text-align: center;
   font-size: 60px;
-  font-family: 'Atrian-FontZillian', Monaco, monospace;
+  font-family: 'benton-regular', Monaco, monospace;
   margin-top: 10px;
 }
 .event-qr{

@@ -41,42 +41,9 @@ h1 {
   margin-right: 20px;
 }
 
-.glyphicon-ring {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  border: 10px solid white;
-  color: white;
-  display: inline-table;
-  text-align: center;
-  border-radius: 45px;
-  box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.2);
-}
+
 .glyphicon-ring:hover {
-  box-shadow: 6px 10px 18px rgba(0, 0, 0, 0.3);
   transform: translate(-7px, -7px) scale(1.1);
-}
-.glyphicon-ring .glyphicon-bordered {
-  font-size: 20px;
-  margin-top: 30px;
-  vertical-align: middle;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  position: relative;
-  transform: scale(1.5);
-}
-
-.glyphicon-white {
-  background: white;
-  color: #f66a26;
-  border: 8px solid #f66a26;
-}
-
-.plus-banner-button {
-  position: fixed;
-  bottom: 100;
-  right: 100;
 }
 
 .input[type=checkbox]{
