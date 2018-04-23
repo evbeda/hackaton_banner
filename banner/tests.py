@@ -388,12 +388,12 @@ class EditEventDesignViewTest(TestBase):
                     "height": 232
                 },
                 "original": {
-                    "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?auto=compress&s=109e5624c733ef88316094935138451f", 
+                    "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?auto=compress&s=109e5624c733ef88316094935138451f",
                     "width": 835,
                     "height": 470
                 },
                 "id": 38099252,
-                "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?h=200&w=450&auto=compress&rect=196%2C184%2C464%2C232&s=dd415facae0a66bcd1ce9178aac57f68", 
+                "url": "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F38099252%2F236776874706%2F1%2Foriginal.jpg?h=200&w=450&auto=compress&rect=196%2C184%2C464%2C232&s=dd415facae0a66bcd1ce9178aac57f68",
                 "aspect_ratio": "2",
                 "edge_color": "#ffffff",
                 "edge_color_set": True
@@ -456,7 +456,6 @@ class BannerNewEventsSelectedCreateViewTest(TestBase):
         saved_events = Event.objects.filter(banner=saved_banner)
 
         default_event_design = EventDesign.objects.get(id=1)
-
         for saved_event in saved_events:
             self.assertTrue(
                 isinstance(saved_event, Event)
@@ -482,9 +481,231 @@ class BannerNewEventsSelectedCreateViewTest(TestBase):
         self.assertEquals(200, response.status_code)
         self.assertFormError(response, 'form', None, "No events selected")
 
+    def test_edit_banner_deleting_event(self, mock_get_api_events):
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match'],
+            u'form-0-custom_title': [u'Wallabies vs pumas'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-1-custom_description': [u''],
+            u'form-1-custom_logo': [u''],
+            u'form-1-custom_title': [u''],
+            u'form-1-description': [u'This is one event!'],
+            u'form-1-end': [u'2021-11-27 11:30:00'],
+            u'form-1-evb_id': [u'40188254150'],
+            u'form-1-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-1-logo': [u'https://img.evbuc.com/'],
+            u'form-1-organizer': [u'15828411681'],
+            u'form-1-selection': [u'on'],
+            u'form-1-start': [u'2019-11-27 21:30:00'],
+            u'form-1-title': [u"Fernando's interview"],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'2', u'2'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+
+        self.client.post("/banner/new/".format(
+        ), form_data, follow=True)
+
+        saved_banner = Banner.objects.latest('changed',)
+        saved_events = Event.objects.filter(banner=saved_banner)
+        self.assertEqual(len(saved_events), 2)
+
+        form_data_edit = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match edited'],
+            u'form-0-custom_title': [u'Wallabies vs pumas edited'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'1', u'1'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+        self.client.post("/banner/{}/banner_update/".format(
+            saved_banner.id
+        ), form_data_edit, follow=True)
+        edited_events = Event.objects.filter(banner=saved_banner)
+        self.assertEqual(len(edited_events), 1)
+        self.assertEqual(
+            edited_events[0].custom_title, 'Wallabies vs pumas edited',
+        )
+        self.assertEqual(
+            edited_events[0].custom_description, 'A rugby match edited',
+        )
+
+    def test_edit_banner_adding_event(self, mock_get_api_events):
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match'],
+            u'form-0-custom_title': [u'Wallabies vs pumas'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'1', u'1'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+        self.client.post("/banner/new/".format(
+        ), form_data, follow=True)
+        saved_banner = Banner.objects.latest('changed',)
+        saved_events = Event.objects.filter(banner=saved_banner)
+        self.assertEqual(len(saved_events), 1)
+
+        form_data_edit = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match edited'],
+            u'form-0-custom_title': [u'Wallabies vs pumas edited'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-1-custom_description': [u''],
+            u'form-1-custom_logo': [u''],
+            u'form-1-custom_title': [u''],
+            u'form-1-description': [u'This is one event!'],
+            u'form-1-end': [u'2021-11-27 11:30:00'],
+            u'form-1-evb_id': [u'40188254150'],
+            u'form-1-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-1-logo': [u'https://img.evbuc.com/'],
+            u'form-1-organizer': [u'15828411681'],
+            u'form-1-selection': [u'on'],
+            u'form-1-start': [u'2019-11-27 21:30:00'],
+            u'form-1-title': [u"Fernando's interview"],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'2', u'2'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+        self.client.post("/banner/{}/banner_update/".format(
+            saved_banner.id
+        ), form_data_edit, follow=True)
+        edited_events = Event.objects.filter(banner=saved_banner)
+        self.assertEqual(len(edited_events), 2)
+        self.assertEqual(
+            edited_events[1].custom_title, 'Wallabies vs pumas edited',
+        )
+        self.assertEqual(
+            edited_events[1].custom_description, 'A rugby match edited',
+        )
+
+    def test_edit_banner_modifing_event(self, mock_get_api_events):
+
+        form_data = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner'],
+            u'form-0-custom_description': [u'A rugby match'],
+            u'form-0-custom_title': [u'Wallabies vs pumas'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'1', u'1'],
+            u'title': [u'CUSTOM BANNER'],
+        }
+        self.client.post("/banner/new/".format(
+        ), form_data, follow=True)
+        total_banners = Banner.objects.all()
+        total_events = Event.objects.all()
+        self.assertEqual(len(total_banners), 1)
+        self.assertEqual(len(total_events), 1)
+
+        form_data_edit = {
+            u'Events Selected': [u''],
+            u'csrfmiddlewaretoken': [u'asd'],
+            u'description': [u'Description for custom banner edited'],
+            u'form-0-custom_description': [u'A rugby match edited'],
+            u'form-0-custom_title': [u'Wallabies vs pumas edited'],
+            u'form-0-description': [u'descripcion'],
+            u'form-0-end': [u'2018-04-29 22:00:00'],
+            u'form-0-evb_id': [u'44384359815'],
+            u'form-0-evb_url': [u'https://www.eventbrite.com/'],
+            u'form-0-logo': [u'none'],
+            u'form-0-organizer': [u'15828411681'],
+            u'form-0-selection': [u'on'],
+            u'form-0-start': [u'2018-04-29 19:00:00'],
+            u'form-0-title': [u'New event'],
+            u'form-INITIAL_FORMS': [u'0', u'0'],
+            u'form-MAX_NUM_FORMS': [u'1000', u'1000'],
+            u'form-MIN_NUM_FORMS': [u'0', u'0'],
+            u'form-TOTAL_FORMS': [u'1', u'1'],
+            u'title': [u'CUSTOM BANNER edited'],
+        }
+        self.client.post("/banner/{}/banner_update/".format(
+            total_banners[0].id
+        ), form_data_edit, follow=True)
+        total_banners_after_edition = Banner.objects.all()
+        total_events_after_edition = Event.objects.all()
+        self.assertEqual(len(total_banners_after_edition), 1)
+        self.assertEqual(len(total_events_after_edition), 1)
+        self.assertEqual(
+            total_events_after_edition[0].custom_title,
+            'Wallabies vs pumas edited',
+        )
+        self.assertEqual(
+            total_events_after_edition[0].custom_description,
+            'A rugby match edited',
+        )
+        self.assertEqual(
+            total_banners_after_edition[0].title,
+            'CUSTOM BANNER edited',
+        )
+        self.assertEqual(
+            total_banners_after_edition[0].description,
+            'Description for custom banner edited',
+        )
+
 
 class BannerFormTest(TestBase):
-
     def setUp(self):
         super(BannerFormTest, self).setUp()
 
