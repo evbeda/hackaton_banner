@@ -428,11 +428,15 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
             pk=self.kwargs['epk']
         )
 
-        form = forms.EventDesignForm(
-            request.POST,
-            instance=event.design,
-        )
-
+        if event.design.name == 'default':
+            form = forms.EventDesignForm(
+                request.POST,
+            )
+        else:
+            form = forms.EventDesignForm(
+                request.POST,
+                instance=event.design,
+            )
         if form.is_valid():
             return self.form_valid(form)
 
@@ -446,7 +450,15 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
     def form_valid(self, form, *args, **kwargs):
         form.instance.user = self.request.user
         event_design = form.save()
+        if event_design.name != 'default':
+            event = Event.objects.select_related(
+                'design'
+            ).get(
+                pk=self.kwargs['epk']
+            )
+            event.design = event_design
         event_design.save()
+        event.save()
 
         return super(
             EditEventDesignView,
