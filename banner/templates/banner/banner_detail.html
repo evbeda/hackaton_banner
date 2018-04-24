@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 {% extends '../shared/base.html' %}
 {% block content %}
-  <form action="" method="post" enctype="multipart/form-data">
-      {% csrf_token %}
   <div class="page-header box">
     <h2>{{ banner.title }}</h2>
   </div>
@@ -26,8 +24,5 @@
       </div>
     </div>
   </div>
-    <p><input type="submit" name="Events Selected" class="btn-submit btn btn-primary
-    float-right"></p>
-  </form>
 {% endblock %}
 
