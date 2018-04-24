@@ -2,6 +2,7 @@ import os
 import sys
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+import pyrebase
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -192,6 +193,17 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# Firebase config
+FIREBASECONFIG = {
+    'apiKey': "AIzaSyDODAtiVVTnIbCUw5bWm8aUeqi1c8G-FpU",
+    'authDomain': "evb-banner.firebaseapp.com",
+    'databaseURL': "https://evb-banner.firebaseio.com",
+    'projectId': "evb-banner",
+    'storageBucket': "evb-banner.appspot.com",
+    'messagingSenderId': "1011811657091"
+}
+firebase = pyrebase.initialize_app(FIREBASECONFIG)
 
 
 # Static files (CSS, JavaScript, Images)
