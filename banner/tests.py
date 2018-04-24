@@ -51,10 +51,10 @@ class TestBase(TestCase):
         return login
 
 
-class IndexViewTest(TestBase):
+class BannerViewTest(TestBase):
 
     def setUp(self):
-        super(IndexViewTest, self).setUp()
+        super(BannerViewTest, self).setUp()
 
     def test_homepage(self):
         response = self.client.get('/')
