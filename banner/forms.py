@@ -6,7 +6,9 @@ from .models import (
     Banner,
     Event,
     EventDesign,
+    Localization
 )
+from django_google_maps.widgets import GoogleMapsAddressWidget
 
 
 class EventForm(forms.ModelForm):
@@ -65,8 +67,8 @@ class EventForm(forms.ModelForm):
         if 'instance' in kwargs:
             self.fields['selection'].initial = True
 
-class BannerForm(forms.ModelForm):
 
+class BannerForm(forms.ModelForm):
     description = forms.CharField(
         required=False,
         widget=forms.Textarea(attrs={'cols': 90, 'rows': 4})
@@ -75,6 +77,7 @@ class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
         exclude = ('user', 'design',)
+
 
 class EventDesignForm(forms.ModelForm):
 
@@ -86,3 +89,13 @@ class EventDesignForm(forms.ModelForm):
     class Meta:
         model = EventDesign
         exclude = ('user', 'name',)
+
+
+class LocalizationForm(forms.ModelForm):
+
+    class Meta(object):
+        model = Localization
+        fields = ['address', 'geolocation']
+        widgets = {
+            "address": GoogleMapsAddressWidget,
+        }

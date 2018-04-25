@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django_google_maps.fields import AddressField, GeoLocationField
 
 
 class EventDesign(models.Model):
@@ -12,6 +13,14 @@ class EventDesign(models.Model):
     html = models.TextField(null=True)
     created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     changed = models.DateTimeField(auto_now=True, blank=True)
+
+
+class Localization(models.Model):
+    address = AddressField(max_length=100)
+    geolocation = GeoLocationField(blank=True)
+
+    def __str__(self):
+        return self.address
 
 
 class BannerDesign(models.Model):
