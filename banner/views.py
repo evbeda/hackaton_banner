@@ -75,10 +75,12 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                     'longitude': longitude,
                     'radius': '5km'
                 }
-            }
+            },
+            'expand.destination_event': [
+                'image'
+            ]
         }
         data_post = eventbrite.post('/destination/search/', data)
-
         return data_post['events']['results']
 
     def get_context_data(self, **kwargs):
@@ -132,6 +134,10 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                         }
                         data_event.append(data)
             else:
+                if event['image'] is not {}:
+                    logo = event['image']['url']
+                else:
+                    logo = None
                 data = {
                     'title': event['name'],
                     'description': event['summary'],
@@ -140,7 +146,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                     'organizer': event['primary_organizer_id'],
                     'evb_id': event['eventbrite_event_id'],
                     'evb_url': event['url'],
-                    'logo': '/media/25-000.jpg',
+                    'logo': logo,
                 }
                 data_event.append(data)
         messages = []
@@ -314,7 +320,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                             )
                             event.custom_logo = fs.url(filename)
                         event.save()
-                import ipdb;ipdb.set_trace()
+                # import ipdb;ipdb.set_trace()
         except IntegrityError as e:
             print e.message
 
