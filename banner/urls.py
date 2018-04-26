@@ -18,9 +18,7 @@ urlpatterns = [
         ),
         name='select_event',),
     url(r'^new/$',
-        LocalizationView.as_view(
-            template_name='select_localization.html'
-        ),
+        LocalizationView.as_view(),
         name='banner_new'),
     url(r'^(?P<pk>[0-9]+)/banner_detail/$',
         BannerDetailView.as_view(),
