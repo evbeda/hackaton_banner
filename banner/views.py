@@ -43,9 +43,9 @@ from wsgiref.util import FileWrapper
 import imgkit
 from django.http import HttpResponse
 import uuid
-
-
-
+from PIL import Image
+import os
+from django.conf import settings
 DEFAULT_BANNER_DESIGN = 1
 DEFAULT_EVENT_DESIGN = 1
 
@@ -344,11 +344,6 @@ class BannerView(TemplateView, LoginRequiredMixin):
     def get_context_data(self, **kwargs):
         context = super(BannerView, self).get_context_data(**kwargs)
         banners = Banner.objects.filter(user=self.request.user)
-        for banner in banners:
-            events = Event.objects.filter(banner=banner)
-            images = [event.logo for event in events]
-        # if algo:
-            # make_video(["downloaded.png", "banner/static/images/Eventbrite_wordmark_orange.png"], format=VideoWriter_fourcc(*'PIM1'))
         context['banners'] = banners
         return context
 
@@ -371,7 +366,7 @@ def video(request, pk):
     return response
 
 
-def make_video(images, outimg=None, fps=5, size=None,
+def make_video(images, outimg=None, fps=1, size=None,
                is_color=True, format="XVID", outvid='image_video.avi'):
     fourcc = VideoWriter_fourcc(*'PIM1')
     vid = None
@@ -589,11 +584,11 @@ def get_banner_images(pk):
     for event in events:
         event = replace_data(event)
         name = str(uuid.uuid4()) + '.jpg'
-        # event.design.html
         try:
             body = '<div style="width:100px; height: 50px">'
             end = '</div>'
-            imgkit.from_string(body + event.design.html + end, name)
+            css = [os.path.join(settings.BASE_DIR, 'banner/static/css/base.css'), os.path.join(settings.BASE_DIR, 'banner/static/css/banner-design.css'),os.path.join(settings.BASE_DIR, 'banner/static/css/banner-new.css'),os.path.join(settings.BASE_DIR, 'banner/static/css/fonts.css'), os.path.join(settings.BASE_DIR, 'banner/static/css/login.css'),]
+            imgkit.from_string(event.design.html, name, css=css)
         except Exception:
             pass
 
