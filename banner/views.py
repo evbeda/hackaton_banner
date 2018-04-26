@@ -580,20 +580,25 @@ class LocalizationView(FormView):
         qs = '&'.join(('lat='+latitude, 'long='+longitude,))
         return HttpResponseRedirect('?'.join((url,qs)))
 
-def download_video(request, pk):
+
+def get_banner_images(pk):
     banner = Banner.objects.get(pk=pk)
     events = Event.objects.select_related('design').filter(banner=banner)
-
-    output = ''
+    # output = ''
+    files = []
     for event in events:
         event = replace_data(event)
-        output += event.design.html
+        name = str(uuid.uuid4()) + '.jpg'
+        # event.design.html
+        try:
+            body = '<div style="width:100px; height: 50px">'
+            end = '</div>'
+            imgkit.from_string(body + event.design.html + end, name)
+        except Exception:
+            pass
 
-    imgkit.from_string(events[0].design.html, 'out.jpg')
-    with open('out.jpg') as html_to_image:
-        read_html = html_to_image.read()
-    response = HttpResponse(read_html, content_type="image/jpeg")
-    return response
+        files.append(name)
+    return files
 
 
 def replace_data(event):
