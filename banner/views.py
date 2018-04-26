@@ -579,3 +579,66 @@ class LocalizationView(FormView):
         url = reverse('select_event')
         qs = '&'.join(('lat='+latitude, 'long='+longitude,))
         return HttpResponseRedirect('?'.join((url,qs)))
+
+def download_video(request, pk):
+    banner = Banner.objects.get(pk=pk)
+    events = Event.objects.select_related('design').filter(banner=banner)
+
+    output = ''
+    for event in events:
+        event = replace_data(event)
+        output += event.design.html
+
+    imgkit.from_string(events[0].design.html, 'out.jpg')
+    with open('out.jpg') as html_to_image:
+        read_html = html_to_image.read()
+    response = HttpResponse(read_html, content_type="image/jpeg")
+    return response
+
+
+def replace_data(event):
+    if event.custom_title:
+        event.design.html = unicode(event.design.html).replace(
+            '|| title ||', unicode(event.custom_title)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| title ||', unicode(event.title)
+        )
+
+    if event.custom_description:
+        event.design.html = unicode(event.design.html).replace(
+            '|| description ||', unicode(event.custom_description)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| description ||', unicode(event.description)
+        )
+
+    if event.custom_logo:
+        event.design.html = unicode(event.design.html).replace(
+            '|| logo ||', unicode(event.custom_logo)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| logo ||', unicode(event.logo)
+        )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| startdate_month ||',
+        calendar.month_name[event.start.month][:3].upper() + '.'
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| startdate_day ||', unicode(event.start.day)
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| evb_url ||', unicode(event.evb_url)
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| id ||', unicode(event.id)
+    )
+
+    return event
