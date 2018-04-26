@@ -31,7 +31,6 @@ from .models import (
 from forms import LocalizationForm
 from django.views.generic.edit import FormView
 from django.shortcuts import render, get_object_or_404
-<<<<<<< HEAD
 import os
 import cv2
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
