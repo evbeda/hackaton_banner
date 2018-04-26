@@ -9,29 +9,30 @@
 <div class="page-body">
   <div class="container-fluid" style="padding-top: 30px;">
     {% if banners %}
-      <div class="row">
-        <div class="col-md-10">
-          <div class="list-group" style="">
-           {% for banner in banners %}
-              <div class="" style="padding-top: 5px">
-                <div class="list-group-item" style="height:100px; border: 2px solid #C0C0C0">
-                  <div class="row">
-                    <div class="col-md-7">
-                      <h4 style="">{{ banner.title }}</h4>
-                      <p class="float-left">{{ banner.description }}</p>
-                    </div>
-                    <div class="col-md-2">
-                      <a class="text-black" href="{% url 'banner_detail' pk=banner.pk %}">
-                        <button type="button" class="btn btn-default"><h5> Ver contenido</h5></button>
-                      </a>
-                    </div>
-                    <div class="col-md-1">
-                      <a data-toggle="tooltip" data-placement="top" title="vista previa del banner" class="" href="{% url 'preview' pk=banner.pk %}" target="blank">
-                        <span style="font-size:24px; margin-right: 20px; color:#808080" class="fas fa-eye"></span>
-                      </a>
-                      <p><h5>Ver</h5></p>
-                    </div>
-                    <div class="col-md-1">
+    <div class="row">
+    <div class="col-md-10">
+      <div class="list-group" style="">
+
+        {% for banner in banners %}
+          <div class="" style="padding-top: 5px">
+                  <div class="list-group-item" style="height:100px; border: 2px solid #C0C0C0">
+                    <div class="row">
+                      <div class="col-md-7">
+                        <h4 style="">{{ banner.title }}</h4>
+                        <p class="float-left">{{ banner.description }}</p>
+                      </div>
+                        <div class="col-md-2">
+                          <a class="text-black" href="{% url 'banner_detail' pk=banner.pk %}">
+                            <button type="button" class="btn btn-default">Ver contenido</button>
+                        </a>
+                        </div>
+                      <div class="col-md-1">
+                        <a data-toggle="tooltip" data-placement="top" title="vista previa del banner" class="" href="{% url 'preview' pk=banner.pk %}" target="blank">
+                          <span style="font-size:24px; margin-right: 20px; color:#808080" class="fas fa-eye"></span>
+                        </a>
+                          <p><h5>Ver</h5></p>
+                      </div>
+                      <div class="col-md-1">
                       <a data-toggle="tooltip" data-placement="top" title="Editar banner" class="text-green" href="{% url 'banner_update' pk=banner.pk %}">
                         <span style="font-size:24px; margin-right: 20px; color:#808080" class="fas fa-edit"></span>
                       </a>
@@ -42,6 +43,7 @@
                         <i style=" font-size:24px; color:#808080"  class="fa">&#xf00d;</i>
                       </a>
                       <p><h5>Eliminar</h5></p>
+
                     </div>
                   </div>
                 </div>

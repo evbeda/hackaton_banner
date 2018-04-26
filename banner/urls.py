@@ -6,6 +6,8 @@ from .views import (
     BannerDeleteView,
     EditEventDesignView,
     LocalizationView,
+    download_video,
+
 )
 from . import views
 
