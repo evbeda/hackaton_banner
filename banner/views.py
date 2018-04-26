@@ -305,7 +305,8 @@ class BannerView(TemplateView, LoginRequiredMixin):
         return context
 
 
-def video(request):
+def video(request, pk):
+    import ipdb; ipdb.set_trace()
     make_video(["downloaded.png", "banner/static/images/Eventbrite_wordmark_orange.png"], format=VideoWriter_fourcc(*'PIM1'))
     DATA_ROOT = ''
     file_path = os.path.join(DATA_ROOT, "image_video.avi")
