@@ -1,12 +1,14 @@
 {% extends './shared/base.html' %}
 {% block content %}
-{{form.media}}
-    <form action=“/your-name/” method=“post”>
-        {{form.as_p}}
+    <form method="post">
+        {% csrf_token %}
+        {{form.media}}
+        {{form}}
+
         <button type="submit" name="Events Selected" class="btn-submit btn btn-primary
           float-right">Submit</button>
     </form>
-    <div id="map"></div>
+<!--     <div id="map"></div>
     <script>
       function initMap() {
         var myLatlng = {lat: -25.363, lng: 131.044};
@@ -35,6 +37,6 @@
           map.setCenter(marker.getPosition());
         });
       }
-    </script>
+    </script> -->
 {% endblock %}
 

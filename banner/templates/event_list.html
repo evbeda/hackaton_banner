@@ -10,6 +10,10 @@
   <h3>{{ messages }}</h3>
 {% else %}
 <form action="" method="post" enctype="multipart/form-data">
+{% if long %}
+<input type="hidden" name="lat" value="{{ lat }}" id="lat">
+<input type="hidden" name="long" value="{{ long }}" id="long">
+{% endif %}
     {% csrf_token %}
   <div class="create-banner-header box">
     <div class="row">

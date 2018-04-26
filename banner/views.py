@@ -3,15 +3,17 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.core.files.storage import FileSystemStorage
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse_lazy, reverse
 from django.db import IntegrityError, transaction
 from django.forms import modelformset_factory
+from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django.shortcuts import render
 import calendar
+import json
 from dateutil.parser import parse as parse_date
 import datetime
 from datetime import datetime
@@ -60,8 +62,26 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         eventbrite = Eventbrite(access_token)
         return eventbrite.get('/users/me/events/')['events']
 
-    def get_context_data(self, **kwargs):
+    def get_event_with_localization(self, social_auth, latitude, longitude):
+        # access_token = social_auth[0].access_token
+        access_token = 'ZD2L4JKT3N76KNNHEX47'
+        eventbrite = Eventbrite(access_token)
+        data = {
+            'event_search': {
+                'page_size': 35,
+                'dates': 'current_future',
+                'point_radius': {
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'radius': '5km'
+                }
+            }
+        }
+        data_post = eventbrite.post('/destination/search/', data)
 
+        return data_post['events']['results']
+
+    def get_context_data(self, **kwargs):
         context = super(
             BannerNewEventsSelectedCreateView,
             self
@@ -70,8 +90,18 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         social_auth = self.request.user.social_auth.filter(
             provider='eventbrite'
         )
-        if len(social_auth) > 0:
-            events = self.get_api_events(social_auth)
+        if len(self.request.GET) == 0 and 'lat' not in self.request.POST:
+            if len(social_auth) > 0:
+                events = self.get_api_events(social_auth)
+        else:
+            if len(social_auth) > 0:
+                latitude = self.request.GET.get('lat') or self.request.POST['lat']
+                longitude = self.request.GET.get('long') or self.request.POST['long']
+                context['lat'] = latitude
+                context['long'] = longitude
+                events = self.get_event_with_localization(
+                    social_auth, latitude, longitude
+                )
 
         if self.kwargs:
             existing_events = Event.objects.filter(
@@ -83,24 +113,36 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
 
         data_event = []
         for event in events:
-            if parse_date(event['start']['local']) >= datetime.today():
-                if int(event['id']) not in list_evb_id:
-                    if event['logo'] is not None:
-                        logo = event['logo']['url']
-                    else:
-                        logo = 'none'
-                    data = {
-                        'title': event['name']['text'],
-                        'description': event['description']['text'],
-                        'start': event['start']['local'].replace('T', ' '),
-                        'end': event['end']['local'].replace('T', ' '),
-                        'organizer': event['organizer_id'],
-                        'evb_id': event['id'],
-                        'evb_url': event['url'],
-                        'logo': logo,
-                    }
-                    data_event.append(data)
-
+            if 'start' in event:
+                if parse_date(event['start']['local']) >= datetime.today():
+                    if int(event['id']) not in list_evb_id:
+                        if event['logo'] is not None:
+                            logo = event['logo']['url']
+                        else:
+                            logo = 'none'
+                        data = {
+                            'title': event['name']['text'],
+                            'description': event['description']['text'],
+                            'start': event['start']['local'].replace('T', ' '),
+                            'end': event['end']['local'].replace('T', ' '),
+                            'organizer': event['organizer_id'],
+                            'evb_id': event['id'],
+                            'evb_url': event['url'],
+                            'logo': logo,
+                        }
+                        data_event.append(data)
+            else:
+                data = {
+                    'title': event['name'],
+                    'description': event['summary'],
+                    'start': event['start_date'],
+                    'end': event['end_date'],
+                    'organizer': event['primary_organizer_id'],
+                    'evb_id': event['eventbrite_event_id'],
+                    'evb_url': event['url'],
+                    'logo': 'none',
+                }
+                data_event.append(data)
         messages = []
         if data_event == [] and 'existing_events' not in locals():
             messages.append('You dont have active events')
@@ -210,7 +252,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         ).form_valid(form)
 
     def post(self, request, *args, **kwargs):
-        # import ipdb; ipdb.set_trace()
+        # import ipdb;ipdb.set_trace()
         form = forms.BannerForm(
             request.POST,
         )
@@ -225,7 +267,6 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
             request.FILES,
             queryset=Event.objects.none(),
         )
-        # import ipdb; ipdb.set_trace()
         if form.is_valid() and formset.is_valid():
             if not any([
                     selection_cleaned_data['selection']
@@ -273,6 +314,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                             )
                             event.custom_logo = fs.url(filename)
                         event.save()
+                import ipdb;ipdb.set_trace()
         except IntegrityError as e:
             print e.message
 
@@ -526,163 +568,8 @@ class LocalizationView(FormView):
     form_class = LocalizationForm
     template_name = "select_localization.html"
 
-    def post(self, request, *args, **kwargs):
-        form = forms.LocalizationForm(
-            request.POST,
-        )
-
-class SelectEventFromLocalization(FormView):
-    form_class = forms.BannerForm
-    template_name = 'events_list.html'
-    success_url = reverse_lazy('index')
-
-    def get_api_events(self, social_auth, latitude, longitude):
-        access_token = social_auth[0].access_token
-        eventbrite = Eventbrite(access_token)
-        data = {
-            'event_search': {
-                'page_size': 35,
-                'dates': 'current_future',
-                'point_radius': {
-                    'latitude': latitude,
-                    'longitude': longitude,
-                    'radius': '5km'
-                }
-            }
-        }
-        return eventbrite.post('/destination/search/', data)['events']
-
-    def get_context_data(self, **kwargs):
-
-        context = super(
-            BannerNewEventsSelectedCreateView,
-            self
-        ).get_context_data()
-
-        social_auth = self.request.user.social_auth.filter(
-            provider='eventbrite'
-        )
-        if len(social_auth) > 0:
-            events = self.get_api_events(social_auth)
-
-        if self.kwargs:
-            existing_events = Event.objects.filter(
-                banner_id=self.kwargs['pk'],
-            )
-            list_evb_id = [event.evb_id for event in existing_events]
-        else:
-            list_evb_id = []
-
-        data_event = []
-        for event in events:
-            if parse_date(event['start']['local']) >= datetime.today():
-                if int(event['id']) not in list_evb_id:
-                    if event['logo'] is not None:
-                        logo = event['logo']['url']
-                    else:
-                        logo = 'none'
-                    data = {
-                        'title': event['name']['text'],
-                        'description': event['description']['text'],
-                        'start': event['start']['local'].replace('T', ' '),
-                        'end': event['end']['local'].replace('T', ' '),
-                        'organizer': event['organizer_id'],
-                        'evb_id': event['id'],
-                        'evb_url': event['url'],
-                        'logo': logo,
-                    }
-                    data_event.append(data)
-
-        messages = []
-        if data_event == [] and 'existing_events' not in locals():
-            messages.append('You dont have active events')
-            context['messages'] = messages
-        else:
-            EventFormSet = modelformset_factory(
-                Event,
-                form=forms.EventForm,
-                extra=len(data_event),
-            )
-            if self.kwargs:
-                formset = EventFormSet(
-                    initial=data_event,
-                    queryset=Event.objects.filter(
-                        banner_id=self.kwargs['pk']
-                    ),
-                )
-            else:
-                formset = EventFormSet(
-                    initial=data_event,
-                    queryset=Event.objects.none(),
-                )
-            context['formset'] = formset
-        return context
-
-
-def get_banner_images(pk):
-    banner = Banner.objects.get(pk=pk)
-    events = Event.objects.select_related('design').filter(banner=banner)
-    # output = ''
-    files = []
-    for event in events:
-        event = replace_data(event)
-        name = str(uuid.uuid4()) + '.jpg'
-        # event.design.html
-        try:
-            body = '<div style="width:100px; height: 50px">'
-            end = '</div>'
-            imgkit.from_string(body + event.design.html + end, name)
-        except Exception:
-            pass
-
-        files.append(name)
-    return files
-
-
-def replace_data(event):
-    if event.custom_title:
-        event.design.html = unicode(event.design.html).replace(
-            '|| title ||', unicode(event.custom_title)
-        )
-    else:
-        event.design.html = unicode(event.design.html).replace(
-            '|| title ||', unicode(event.title)
-        )
-
-    if event.custom_description:
-        event.design.html = unicode(event.design.html).replace(
-            '|| description ||', unicode(event.custom_description)
-        )
-    else:
-        event.design.html = unicode(event.design.html).replace(
-            '|| description ||', unicode(event.description)
-        )
-
-    if event.custom_logo:
-        event.design.html = unicode(event.design.html).replace(
-            '|| logo ||', unicode(event.custom_logo)
-        )
-    else:
-        event.design.html = unicode(event.design.html).replace(
-            '|| logo ||', unicode(event.logo)
-        )
-
-    event.design.html = unicode(event.design.html).replace(
-        '|| startdate_month ||',
-        calendar.month_name[event.start.month][:3].upper() + '.'
-    )
-
-    event.design.html = unicode(event.design.html).replace(
-        '|| startdate_day ||', unicode(event.start.day)
-    )
-
-    event.design.html = unicode(event.design.html).replace(
-        '|| evb_url ||', unicode(event.evb_url)
-    )
-
-    event.design.html = unicode(event.design.html).replace(
-        '|| id ||', unicode(event.id)
-    )
-
-    return event
-
+    def form_valid(self, form):
+        latitude, longitude = form.cleaned_data['geolocation'].split(',')
+        url = reverse('select_event')
+        qs = '&'.join(('lat='+latitude, 'long='+longitude,))
+        return HttpResponseRedirect('?'.join((url,qs)))
