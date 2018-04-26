@@ -64,7 +64,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
 
     def get_event_with_localization(self, social_auth, latitude, longitude):
         # access_token = social_auth[0].access_token
-        access_token = 'ZD2L4JKT3N76KNNHEX47'
+        access_token = settings.TOKEN_API
         eventbrite = Eventbrite(access_token)
         data = {
             'event_search': {
@@ -140,7 +140,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
                     'organizer': event['primary_organizer_id'],
                     'evb_id': event['eventbrite_event_id'],
                     'evb_url': event['url'],
-                    'logo': 'none',
+                    'logo': '/media/25-000.jpg',
                 }
                 data_event.append(data)
         messages = []
