@@ -31,6 +31,7 @@ from .models import (
 from forms import LocalizationForm
 from django.views.generic.edit import FormView
 from django.shortcuts import render, get_object_or_404
+<<<<<<< HEAD
 import os
 import cv2
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
@@ -38,6 +39,11 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.http import StreamingHttpResponse
 from wsgiref.util import FileWrapper
+import imgkit
+from django.http import HttpResponse
+
+
+
 
 DEFAULT_BANNER_DESIGN = 1
 DEFAULT_EVENT_DESIGN = 1
@@ -610,4 +616,67 @@ class SelectEventFromLocalization(FormView):
             context['formset'] = formset
         return context
 
+
+def download_video(request, pk):
+    banner = Banner.objects.get(pk=pk)
+    events = Event.objects.select_related('design').filter(banner=banner)
+
+    output = ''
+    for event in events:
+        event = replace_data(event)
+        output += event.design.html
+
+    imgkit.from_string(events[0].design.html, 'out.jpg')
+    with open('out.jpg') as html_to_image:
+        read_html = html_to_image.read()
+    response = HttpResponse(read_html, content_type="image/jpeg")
+    return response
+
+
+def replace_data(event):
+    if event.custom_title:
+        event.design.html = unicode(event.design.html).replace(
+            '|| title ||', unicode(event.custom_title)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| title ||', unicode(event.title)
+        )
+
+    if event.custom_description:
+        event.design.html = unicode(event.design.html).replace(
+            '|| description ||', unicode(event.custom_description)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| description ||', unicode(event.description)
+        )
+
+    if event.custom_logo:
+        event.design.html = unicode(event.design.html).replace(
+            '|| logo ||', unicode(event.custom_logo)
+        )
+    else:
+        event.design.html = unicode(event.design.html).replace(
+            '|| logo ||', unicode(event.logo)
+        )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| startdate_month ||',
+        calendar.month_name[event.start.month][:3].upper() + '.'
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| startdate_day ||', unicode(event.start.day)
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| evb_url ||', unicode(event.evb_url)
+    )
+
+    event.design.html = unicode(event.design.html).replace(
+        '|| id ||', unicode(event.id)
+    )
+
+    return event
 

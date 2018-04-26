@@ -91,6 +91,7 @@ class EventDesignForm(forms.ModelForm):
         exclude = ('user', 'name',)
 
 
+
 class LocalizationForm(forms.ModelForm):
 
     class Meta(object):
@@ -99,3 +100,4 @@ class LocalizationForm(forms.ModelForm):
         widgets = {
             "address": GoogleMapsAddressWidget,
         }
+
