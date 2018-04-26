@@ -40,7 +40,7 @@ from django.http import StreamingHttpResponse
 from wsgiref.util import FileWrapper
 import imgkit
 from django.http import HttpResponse
-
+import uuid
 
 
 
@@ -306,17 +306,18 @@ class BannerView(TemplateView, LoginRequiredMixin):
 
 
 def video(request, pk):
-    import ipdb; ipdb.set_trace()
-    make_video(["downloaded.png", "banner/static/images/Eventbrite_wordmark_orange.png"], format=VideoWriter_fourcc(*'PIM1'))
+    files = get_banner_images(pk)
+    video_output = str(uuid.uuid4()) + '.avi'
+    vid = make_video(files, format=VideoWriter_fourcc(*'PIM1'), outvid=video_output)
     DATA_ROOT = ''
-    file_path = os.path.join(DATA_ROOT, "image_video.avi")
-    filename = os.path.basename('image_video.avi')
+    file_path = os.path.join(DATA_ROOT, video_output)
+    filename = os.path.basename(video_output)
     chunk_size = 8192
     response = StreamingHttpResponse(
         FileWrapper(open(file_path, 'rb'), chunk_size),
         content_type="application/octet-stream"
     )
-    response['Content-Length'] = os.path.getsize('image_video.avi')
+    response['Content-Length'] = os.path.getsize(video_output)
     response['Content-Disposition'] = "attachment; filename=%s" % filename
     cv2.destroyAllWindows()
     return response
@@ -333,6 +334,7 @@ def make_video(images, outimg=None, fps=5, size=None,
         if vid is None:
             if size is None:
                 size = img.shape[1], img.shape[0]
+                size = 1000, 400
             vid = VideoWriter(outvid, fourcc, float(fps), size, is_color)
         if size[0] != img.shape[1] and size[1] != img.shape[0]:
             img = resize(img, size)
@@ -617,20 +619,24 @@ class SelectEventFromLocalization(FormView):
         return context
 
 
-def download_video(request, pk):
+def get_banner_images(pk):
     banner = Banner.objects.get(pk=pk)
     events = Event.objects.select_related('design').filter(banner=banner)
-
-    output = ''
+    # output = ''
+    files = []
     for event in events:
         event = replace_data(event)
-        output += event.design.html
+        name = str(uuid.uuid4()) + '.jpg'
+        # event.design.html
+        try:
+            body = '<div style="width:100px; height: 50px">'
+            end = '</div>'
+            imgkit.from_string(body + event.design.html + end, name)
+        except Exception:
+            pass
 
-    imgkit.from_string(events[0].design.html, 'out.jpg')
-    with open('out.jpg') as html_to_image:
-        read_html = html_to_image.read()
-    response = HttpResponse(read_html, content_type="image/jpeg")
-    return response
+        files.append(name)
+    return files
 
 
 def replace_data(event):
