@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.sites',
     'django.contrib.auth',
+    'django_google_maps',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -39,7 +40,10 @@ INSTALLED_APPS = [
     'banner',
     'ckeditor',
     'bootstrap3',
+
+
 ]
+
 
 SITE_ID = 1
 
@@ -142,6 +146,7 @@ SOCIAL_AUTH_EVENTBRITE_KEY = get_env_variable('SOCIAL_AUTH_EVENTBRITE_KEY')
 SOCIAL_AUTH_EVENTBRITE_SECRET = get_env_variable(
     'SOCIAL_AUTH_EVENTBRITE_SECRET',
 )
+GOOGLE_MAPS_API_KEY = 'AIzaSyDwZAEta8rzN1xrVZVZFaVkMbxhPS5i4Jw'
 
 CKEDITOR_CONFIGS = {
     'default': {

@@ -8,6 +8,7 @@ dj-database-url==0.4.2
 Django==1.11
 django-bootstrap3==9.1.0
 django-ckeditor==5.4.0
+django-google-maps==0.10.1
 django-js-asset==1.0.0
 django-qrcode==0.3
 enum34==1.1.6
@@ -24,7 +25,9 @@ ipython==5.5.0
 ipython-genutils==0.2.0
 Jinja2==2.6
 mock==2.0.0
+numpy==1.14.2
 oauthlib==2.0.7
+opencv-python==3.4.0.12
 pathlib2==2.3.0
 pbr==3.1.1
 pexpect==4.4.0

@@ -28,6 +28,7 @@ from .models import (
     Event,
     EventDesign,
 )
+from forms import LocalizationForm
 from django.views.generic.edit import FormView
 from django.shortcuts import render, get_object_or_404
 import os
@@ -511,3 +512,102 @@ class EditEventDesignView(FormView, LoginRequiredMixin):
             EditEventDesignView,
             self,
         ).form_valid(form)
+
+
+class LocalizationView(FormView):
+    form_class = LocalizationForm
+    template_name = "select_localization.html"
+
+    def post(self, request, *args, **kwargs):
+        form = forms.LocalizationForm(
+            request.POST,
+        )
+
+class SelectEventFromLocalization(FormView):
+    form_class = forms.BannerForm
+    template_name = 'events_list.html'
+    success_url = reverse_lazy('index')
+
+    def get_api_events(self, social_auth, latitude, longitude):
+        access_token = social_auth[0].access_token
+        eventbrite = Eventbrite(access_token)
+        data = {
+            'event_search': {
+                'page_size': 35,
+                'dates': 'current_future',
+                'point_radius': {
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'radius': '5km'
+                }
+            }
+        }
+        return eventbrite.post('/destination/search/', data)['events']
+
+    def get_context_data(self, **kwargs):
+
+        context = super(
+            BannerNewEventsSelectedCreateView,
+            self
+        ).get_context_data()
+
+        social_auth = self.request.user.social_auth.filter(
+            provider='eventbrite'
+        )
+        if len(social_auth) > 0:
+            events = self.get_api_events(social_auth)
+
+        if self.kwargs:
+            existing_events = Event.objects.filter(
+                banner_id=self.kwargs['pk'],
+            )
+            list_evb_id = [event.evb_id for event in existing_events]
+        else:
+            list_evb_id = []
+
+        data_event = []
+        for event in events:
+            if parse_date(event['start']['local']) >= datetime.today():
+                if int(event['id']) not in list_evb_id:
+                    if event['logo'] is not None:
+                        logo = event['logo']['url']
+                    else:
+                        logo = 'none'
+                    data = {
+                        'title': event['name']['text'],
+                        'description': event['description']['text'],
+                        'start': event['start']['local'].replace('T', ' '),
+                        'end': event['end']['local'].replace('T', ' '),
+                        'organizer': event['organizer_id'],
+                        'evb_id': event['id'],
+                        'evb_url': event['url'],
+                        'logo': logo,
+                    }
+                    data_event.append(data)
+
+        messages = []
+        if data_event == [] and 'existing_events' not in locals():
+            messages.append('You dont have active events')
+            context['messages'] = messages
+        else:
+            EventFormSet = modelformset_factory(
+                Event,
+                form=forms.EventForm,
+                extra=len(data_event),
+            )
+            if self.kwargs:
+                formset = EventFormSet(
+                    initial=data_event,
+                    queryset=Event.objects.filter(
+                        banner_id=self.kwargs['pk']
+                    ),
+                )
+            else:
+                formset = EventFormSet(
+                    initial=data_event,
+                    queryset=Event.objects.none(),
+                )
+            context['formset'] = formset
+        return context
+
+
