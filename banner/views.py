@@ -30,7 +30,13 @@ from .models import (
 )
 from django.views.generic.edit import FormView
 from django.shortcuts import render, get_object_or_404
-
+import os
+import cv2
+from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
+from django.http import HttpResponse
+from django.conf import settings
+from django.http import StreamingHttpResponse
+from wsgiref.util import FileWrapper
 
 DEFAULT_BANNER_DESIGN = 1
 DEFAULT_EVENT_DESIGN = 1
@@ -60,7 +66,7 @@ class BannerNewEventsSelectedCreateView(FormView, LoginRequiredMixin):
         )
         if len(social_auth) > 0:
             events = self.get_api_events(social_auth)
- 
+
         if self.kwargs:
             existing_events = Event.objects.filter(
                 banner_id=self.kwargs['pk'],
@@ -283,8 +289,49 @@ class BannerView(TemplateView, LoginRequiredMixin):
 
     def get_context_data(self, **kwargs):
         context = super(BannerView, self).get_context_data(**kwargs)
-        context['banners'] = Banner.objects.filter(user=self.request.user)
+        banners = Banner.objects.filter(user=self.request.user)
+        for banner in banners:
+            events = Event.objects.filter(banner=banner)
+            images = [event.logo for event in events]
+        # if algo:
+            # make_video(["downloaded.png", "banner/static/images/Eventbrite_wordmark_orange.png"], format=VideoWriter_fourcc(*'PIM1'))
+        context['banners'] = banners
         return context
+
+
+def video(request):
+    make_video(["downloaded.png", "banner/static/images/Eventbrite_wordmark_orange.png"], format=VideoWriter_fourcc(*'PIM1'))
+    DATA_ROOT = ''
+    file_path = os.path.join(DATA_ROOT, "image_video.avi")
+    filename = os.path.basename('image_video.avi')
+    chunk_size = 8192
+    response = StreamingHttpResponse(
+        FileWrapper(open(file_path, 'rb'), chunk_size),
+        content_type="application/octet-stream"
+    )
+    response['Content-Length'] = os.path.getsize('image_video.avi')
+    response['Content-Disposition'] = "attachment; filename=%s" % filename
+    cv2.destroyAllWindows()
+    return response
+
+
+def make_video(images, outimg=None, fps=5, size=None,
+               is_color=True, format="XVID", outvid='image_video.avi'):
+    fourcc = VideoWriter_fourcc(*'PIM1')
+    vid = None
+    for image in images:
+        if not os.path.exists(image):
+            raise Exception("image")
+        img = imread(image)
+        if vid is None:
+            if size is None:
+                size = img.shape[1], img.shape[0]
+            vid = VideoWriter(outvid, fourcc, float(fps), size, is_color)
+        if size[0] != img.shape[1] and size[1] != img.shape[0]:
+            img = resize(img, size)
+        vid.write(img)
+    vid.release()
+    return vid
 
 
 @method_decorator(login_required, name='dispatch')
