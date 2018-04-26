@@ -17,15 +17,15 @@
           <div class="" style="padding-top: 5px">
                   <div class="list-group-item" style="height:100px; border: 2px solid #C0C0C0">
                     <div class="row">
-                    <div class="col-md-7">
-                      <h4 style="">{{ banner.title }}</h4>
-                      <p class="float-left">{{ banner.description }}</p>
-                    </div>
-                    <div class="col-md-2">
-                      <a class="text-black" href="{% url 'banner_detail' pk=banner.pk %}">
-                        <button type="button" class="btn btn-default"><h5> Ver contenido</h5></button>
-                    </a>
+                      <div class="col-md-7">
+                        <h4 style="">{{ banner.title }}</h4>
+                        <p class="float-left">{{ banner.description }}</p>
                       </div>
+                        <div class="col-md-2">
+                          <a class="text-black" href="{% url 'banner_detail' pk=banner.pk %}">
+                            <button type="button" class="btn btn-default">Ver contenido</button>
+                        </a>
+                        </div>
                       <div class="col-md-1">
                         <a data-toggle="tooltip" data-placement="top" title="vista previa del banner" class="" href="{% url 'preview' pk=banner.pk %}" target="blank">
                           <span style="font-size:24px; margin-right: 20px; color:#808080" class="fas fa-eye"></span>
@@ -44,10 +44,9 @@
                       </a>
                       <p><h5>Eliminar</h5></p>
                       </div>
-
                   </div>
-
                   </div>
+                   <a type="button" class="btn btn-light" href="{% url 'html_events' pk=banner.pk %}">Convert to image</a>
            </div>
         {% endfor %}
 

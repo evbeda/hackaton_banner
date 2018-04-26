@@ -5,6 +5,7 @@ from .views import (
     BannerNewEventsSelectedCreateView,
     BannerDeleteView,
     EditEventDesignView,
+    download_video,
 )
 
 
@@ -32,5 +33,10 @@ urlpatterns = [
         ),
     url(r'^(?P<pk>[0-9]+)/event/(?P<epk>[0-9]+)/$',
         EditEventDesignView.as_view(),
-        name='edit_design'),
+        name='edit_design'
+        ),
+    url(r'^(?P<pk>[0-9]+)/event/',
+        download_video,
+        name='html_events'
+        ),
 ]

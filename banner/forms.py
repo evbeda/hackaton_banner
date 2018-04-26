@@ -76,6 +76,7 @@ class BannerForm(forms.ModelForm):
         model = Banner
         exclude = ('user', 'design',)
 
+
 class EventDesignForm(forms.ModelForm):
 
     html = forms.CharField(
@@ -86,3 +87,11 @@ class EventDesignForm(forms.ModelForm):
     class Meta:
         model = EventDesign
         exclude = ('user', 'name',)
+
+
+class EventHtmlForm(forms.Form):
+
+    all_events_html = forms.CharField(
+        required=True,
+        widget=CKEditorWidget(),
+    )
